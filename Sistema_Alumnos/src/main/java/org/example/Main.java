@@ -1,6 +1,5 @@
 package org.example;
 
-import org.example.Connections.HibernateUtil;
 import org.hibernate.Session;
 
 public class Main {
