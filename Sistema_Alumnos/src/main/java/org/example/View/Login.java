@@ -38,8 +38,8 @@ public class Login extends javax.swing.JFrame {
         panel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
 
 
-        JTextField textField=new JTextField(10);
-        JPasswordField passwordField=new JPasswordField(10);
+        JTextField UserTxt=new JTextField(10);
+        JPasswordField PassTxt=new JPasswordField(10);
 
         // botón de registro
         JButton botonRegistro=new JButton("Registrate");
@@ -51,24 +51,26 @@ public class Login extends javax.swing.JFrame {
         botonRegistro.setPreferredSize(new Dimension(120,35));
 
         // Estilos de texto
-        textField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        passwordField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        UserTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        PassTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+
+        // agregar componentes al panel
+        panel.add(labelUsuario);
+        panel.add(UserTxt);
+        panel.add(labelPassword);
+        panel.add(PassTxt);
+        panel.add(botonRegistro);
+
+        add(panel);
 
         botonRegistro.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(Login.this, "Registrado Correctamente!");
+               usuario=conexionUsuario.login(UserTxt.getText(), PassTxt.getText());
             }
         });
 
-        // agregar componentes al panel
-        panel.add(labelUsuario);
-        panel.add(textField);
-        panel.add(labelPassword);
-        panel.add(passwordField);
-        panel.add(botonRegistro);
 
-        add(panel);
     }
 
 public static void main(String[] args) {
