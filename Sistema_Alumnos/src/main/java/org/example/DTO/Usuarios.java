@@ -5,16 +5,16 @@ public class Usuarios {
     private String nombre;
     private String apellido;
     private String usuario;
-    private String contraseña;
+    private String contrasena;
     public Usuarios(){
 
     }
-    public Usuarios(int id, String nombre, String apellido, String usuario, String contraseña){
+    public Usuarios(int id, String nombre, String apellido, String usuario, String contrasena){
         this.setId(id);
         this.setNombre(nombre);
         this.setApellido(apellido);
         this.setUsuario(usuario);
-        this.setContraseña(contraseña);
+        this.setContrasena(contrasena);
     }
 
     public int getId() {
@@ -49,11 +49,11 @@ public class Usuarios {
         this.usuario = usuario;
     }
 
-    public String getContraseña() {
-        return contraseña;
+    public String getContrasena() {
+        return contrasena;
     }
 
-    public void setContraseña(String contraseña) {
-        this.contraseña = contraseña;
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
     }
 }

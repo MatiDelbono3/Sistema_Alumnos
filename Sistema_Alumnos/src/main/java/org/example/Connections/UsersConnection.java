@@ -23,7 +23,7 @@ public Usuarios login(String user, String password){
             newUser.setNombre(rs.getString(2));
             newUser.setApellido(rs.getString(3));
             newUser.setUsuario(rs.getString(4));
-            newUser.setContraseña(rs.getString(5));
+            newUser.setContrasena(rs.getString(5));
         }
     }catch (Exception e){
         JOptionPane.showConfirmDialog(null, e);
