@@ -66,7 +66,14 @@ public class Login extends javax.swing.JFrame {
         botonRegistro.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-               usuario=conexionUsuario.login(UserTxt.getText(), PassTxt.getText());
+                String password=new String(PassTxt.getPassword());
+               usuario=conexionUsuario.login(UserTxt.getText(), password);
+               if (usuario.getUsuario() != null && usuario.getContrasena() != null){
+                   JOptionPane.showConfirmDialog(null, "Bienvenido al sistema");
+               }
+               else {
+                   JOptionPane.showMessageDialog( null, "no es posible registrarte");
+               }
             }
         });
 
