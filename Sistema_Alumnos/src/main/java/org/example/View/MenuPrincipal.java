@@ -1,5 +1,6 @@
 package org.example.View;
 
+import org.example.Connections.CursoConnection;
 import org.example.Connections.UsersConnection;
 import org.example.DTO.Cursos;
 import org.example.DTO.Usuarios;
@@ -13,7 +14,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     UsersConnection conexionUsuario=new UsersConnection();
     Usuarios usuario=new Usuarios();
     Cursos curso=new Cursos();
-
+    CursoConnection CursoC=new CursoConnection();
     public MenuPrincipal() {
         setTitle("Menu Principal");
         setSize(600,450);
@@ -24,7 +25,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     private void initComponents(){
      //panel
-     JTabbedPane PanelMenu=new JTabbedPane();
+     JPanel PanelMenu=new JPanel();
      PanelMenu.setBackground(Color.GREEN);
      PanelMenu.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 20));
 
@@ -72,7 +73,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     botonCursos.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            
+
         }
     });
     }
