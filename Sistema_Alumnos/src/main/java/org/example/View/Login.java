@@ -100,10 +100,20 @@ public class Login extends javax.swing.JFrame {
                usuario=conexionUsuario.login(UserTxt.getText(), password);
                if (usuario.getUsuario() != null && usuario.getContrasena() != null){
                    JOptionPane.showConfirmDialog(null, "Bienvenido al sistema");
+                   MenuPrincipal menu=new MenuPrincipal();
+                   menu.setVisible(true);
+                   dispose();
                }
                else {
                    JOptionPane.showMessageDialog( null, "no es posible registrarte");
                }
+            }
+
+        });
+        botonCierre.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
             }
         });
 
