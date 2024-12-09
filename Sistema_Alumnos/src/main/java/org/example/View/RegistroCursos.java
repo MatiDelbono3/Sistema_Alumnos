@@ -47,9 +47,9 @@ public class RegistroCursos extends javax.swing.JFrame{
         JLabel labelCupo = new JLabel("Cupo");
         labelCupo.setFont(new Font("Arial", Font.BOLD, 14));
 
-       JTextField NombreTxt = new JTextField(10);
-        JTextField NivelTxt = new JTextField(10);
-        JTextField CupoTxt = new JTextField(10);
+       NombreTxt = new JTextField(10);
+       NivelTxt = new JTextField(10);
+       CupoTxt = new JTextField(10);
 
         // botones
         JButton botonRegistroCurso=new JButton("Registrar Curso");
@@ -87,6 +87,7 @@ public class RegistroCursos extends javax.swing.JFrame{
 
                if (CC.insertar(curso) >0 ){
                    JOptionPane.showMessageDialog(null, "curso registrado con éxito");
+                   limpiarDatosCurso();
                }
                else {
                    JOptionPane.showConfirmDialog(null, "error al registrar el curso");
@@ -98,7 +99,7 @@ public class RegistroCursos extends javax.swing.JFrame{
             NombreTxt.setText("");
             NivelTxt.setText("");
             CupoTxt.setText("");
-            dispose();
+
         }
 
 
