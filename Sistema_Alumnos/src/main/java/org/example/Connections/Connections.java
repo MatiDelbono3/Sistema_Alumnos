@@ -6,7 +6,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class Connections implements AutoCloseable{
+public class Connections {
     Connection conexion = null;
     String  url="jdbc:mysql://localhost:3306/BdAlumnos";
     String user="root";
@@ -16,24 +16,25 @@ public class Connections implements AutoCloseable{
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
             conexion=  DriverManager.getConnection(url, user, password);
+            conexion.setAutoCommit(true);
         }catch (Exception e){
             JOptionPane.showConfirmDialog(null, e);
         }
         return conexion;
     }
 
-    public PreparedStatement prepareStatement(String sql) throws SQLException  {
-        if (conexion != null) {
-            return conexion.prepareStatement(sql);
-        }
-        throw new SQLException("No hay conexión establecida");
-    }
 
-    @Override
-    public void close() throws Exception {
-        if (conexion != null && !conexion.isClosed()) {
-            conexion.close();
-    }
+    public  void closeConnection() {
+
+            try {
+                if (conexion != null && !conexion.isClosed()){
+                conexion.close();
+                }
+            } catch (SQLException e) {
+                System.out.println("Error al cerrar la conexión");
+                e.printStackTrace(); // Mostrar el error si ocurre al cerrar
+            }
+
 }
 }
 

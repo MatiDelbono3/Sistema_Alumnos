@@ -16,6 +16,8 @@ public class Cursos {
         this.setCupo_Maximo(Cupo_Maximo);
     }
 
+
+
     public int getId() {
         return id;
     }

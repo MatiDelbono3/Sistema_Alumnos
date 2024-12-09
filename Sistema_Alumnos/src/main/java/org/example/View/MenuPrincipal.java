@@ -13,8 +13,13 @@ import java.awt.event.ActionListener;
 public class MenuPrincipal extends javax.swing.JFrame {
     UsersConnection conexionUsuario=new UsersConnection();
     Usuarios usuario=new Usuarios();
-    Cursos curso=new Cursos();
-    CursoConnection CursoC=new CursoConnection();
+    CursoConnection CC=new CursoConnection();
+
+    private JTextField NombreTxt;
+    private JTextField NivelTxt;
+    private JTextField CupoTxt;
+
+
     public MenuPrincipal() {
         setTitle("Menu Principal");
         setSize(600,450);
@@ -22,21 +27,30 @@ public class MenuPrincipal extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         initComponents();
     }
+
     @SuppressWarnings("unchecked")
-    private void initComponents(){
-     //panel
-     JPanel PanelMenu=new JPanel();
-     PanelMenu.setBackground(Color.GREEN);
-     PanelMenu.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 20));
+    private void initComponents() {
+
+
+        //panel
+        JPanel panelMenu = new JPanel();
+        panelMenu.setLayout(new BorderLayout());
+        panelMenu.setBackground(Color.GREEN); // Color de fondo verde
+
+
+
+
+
 
     // botones
-    JButton botonCursos=new JButton("Cursos");
+        JButton botonCursos=new JButton("Cursos");
         botonCursos.setFont(new Font("Arial",Font.BOLD, 14));
         botonCursos.setBackground(new Color(51, 153, 255));
         botonCursos.setForeground(Color.WHITE);
         botonCursos.setFocusPainted(false);
         botonCursos.setBorderPainted(false);
-        botonCursos.setPreferredSize(new Dimension(120,35));
+        botonCursos.setPreferredSize(new Dimension(150,35));
+
 
 
         JButton botonInscripciones=new JButton("Inscripciones");
@@ -47,13 +61,17 @@ public class MenuPrincipal extends javax.swing.JFrame {
         botonInscripciones.setBorderPainted(false);
         botonInscripciones.setPreferredSize(new Dimension(150,35));
 
+
+
+
+
         JButton botonProfesores=new JButton("Docentes");
         botonProfesores.setFont(new Font("Arial",Font.BOLD, 14));
         botonProfesores.setBackground(new Color(51, 153, 255));
         botonProfesores.setForeground(Color.WHITE);
         botonProfesores.setFocusPainted(false);
         botonProfesores.setBorderPainted(false);
-        botonProfesores.setPreferredSize(new Dimension(150,35));
+        botonProfesores.setPreferredSize(new Dimension(120,35));
 
 
         // imagen
@@ -63,22 +81,41 @@ public class MenuPrincipal extends javax.swing.JFrame {
         labelImagenCarreras.setIcon(new ImageIcon(imagen));
         labelImagenCarreras.setHorizontalAlignment(JLabel.CENTER);
 
-    // agregar componentes al panel
-    PanelMenu.add(botonCursos);
-    PanelMenu.add(botonInscripciones);
-    PanelMenu.add(botonProfesores);
-    PanelMenu.add(labelImagenCarreras, BorderLayout.NORTH);
-    // agregar panel
-    add(PanelMenu);
-    botonCursos.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
+        JPanel panelBotones = new JPanel();
+        panelBotones.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10)); // Disposición vertical
+        panelBotones.setBackground(Color.GREEN);
+        panelBotones.add(botonCursos);
+        panelBotones.add(botonInscripciones);
+        panelBotones.add(botonProfesores);
 
-        }
+        // Agregar la imagen al panel principal
+        panelMenu.add(labelImagenCarreras, BorderLayout.NORTH);
+        panelMenu.add(panelBotones, BorderLayout.CENTER); // Panel con los botones en el centro
+
+    add(panelMenu);
+
+        botonCursos.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RegistroCursos RCur=new RegistroCursos();
+                RCur.setVisible(true);
+
+            }
     });
+
     }
-        public static void main(String[] args) {
-            SwingUtilities.invokeLater(() ->
-                    new MenuPrincipal().setVisible(true));
-        };
-}
+    void limpiarDatosCurso(){
+        NombreTxt.setText("");
+        NivelTxt.setText("");
+        CupoTxt.setText("");
+    };
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() ->
+                new MenuPrincipal().setVisible(true));
+    };
+        }
+
+
+
+
+

@@ -76,7 +76,6 @@ public class Login extends javax.swing.JFrame {
         labelImagen.setIcon(new ImageIcon(imagen));
         labelImagen.setHorizontalAlignment(JLabel.CENTER);
 
-        //Agregar la imagen al panel
 
 
         // Estilos de texto
