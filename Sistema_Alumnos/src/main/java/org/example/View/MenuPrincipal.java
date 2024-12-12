@@ -4,11 +4,11 @@ import org.example.Connections.CursoConnection;
 import org.example.Connections.UsersConnection;
 import org.example.DTO.Cursos;
 import org.example.DTO.Usuarios;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 public class MenuPrincipal extends javax.swing.JFrame {
     UsersConnection conexionUsuario=new UsersConnection();
@@ -97,8 +97,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
         botonCursos.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                RegistroCursos RCur=new RegistroCursos();
-                RCur.setVisible(true);
+                RegistroCursos Cur= null;
+                Cur = new RegistroCursos();
+                Cur.setVisible(true);
 
             }
     });

@@ -3,11 +3,10 @@ package org.example.Connections;
 import org.example.DTO.Cursos;
 
 import javax.swing.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
+import java.awt.*;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 public class CursoConnection {
     private final Connections cn=new Connections();
 
@@ -19,6 +18,7 @@ public class CursoConnection {
             ps.setString(1, curso.getNombre_curso());
             ps.setString(2, curso.getNivel());
             ps.setInt(3, curso.getCupo_Maximo());
+
             int n=ps.executeUpdate();
             System.out.println("Número de filas afectadas: " + n); // Depuración
             return n;
@@ -28,8 +28,28 @@ public class CursoConnection {
             return 0;
         }
     }
+    public List<Cursos> ListarCursos() throws SQLException {
+        List<Cursos>ListaCursos=new ArrayList<>();
+        String Sql="Select * from Cursos";
+        try (Connection conexion= cn.Connect();
+             PreparedStatement ps = ( conexion.prepareStatement(Sql));
+             ResultSet rs=ps.executeQuery()){
+             while (rs.next()){
+                 Cursos curso=new Cursos();
+                 curso.setId(rs.getInt(1));
+                 curso.setNombre_curso(rs.getString(2));
+                 curso.setNivel(rs.getString(3));
+                 curso.setCupo_Maximo(rs.getInt(4));
+                 ListaCursos.add(curso);
+             }
+
+        } catch (SQLException exc){
+            JOptionPane.showMessageDialog(null, "Error al listar curso");
+        }
+        return ListaCursos;
+    }
     public boolean probarConexion() {
-        String url = "jdbc:mysql://localhost:3306/BdAlumnos"; // Ajusta según tu base de datos
+        String url = "jdbc:mysql://localhost:3307/BdAlumnos"; // Ajusta según tu base de datos
         String usuario = "root";
         String contrasena = "123456";
 

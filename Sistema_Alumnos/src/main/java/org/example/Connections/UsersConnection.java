@@ -24,9 +24,8 @@ public Usuarios login(String user, String password){
             while (rs.next()) {
                 newUser.setId(rs.getInt(1));
                 newUser.setNombre(rs.getString(2));
-                newUser.setApellido(rs.getString(3));
-                newUser.setUsuario(rs.getString(4));
-                newUser.setContrasena(rs.getString(5));
+                newUser.setUsuario(rs.getString(3));
+                newUser.setContrasena(rs.getString(4));
             }
         }
     } catch (Exception e) {
