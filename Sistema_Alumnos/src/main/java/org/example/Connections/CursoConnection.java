@@ -15,9 +15,9 @@ public class CursoConnection {
 
         try (Connection conexion= cn.Connect();
             PreparedStatement ps = ((Connection) conexion).prepareStatement(sql)){
-            ps.setString(1, curso.getNombre_curso());
-            ps.setString(2, curso.getNivel());
-            ps.setInt(3, curso.getCupo_Maximo());
+            ps.setInt(1, curso.getCupo_Maximo());
+            ps.setInt(2, curso.getId());
+
 
             int n=ps.executeUpdate();
             System.out.println("Número de filas afectadas: " + n); // Depuración
@@ -47,6 +47,26 @@ public class CursoConnection {
             JOptionPane.showMessageDialog(null, "Error al listar curso");
         }
         return ListaCursos;
+    }
+    public boolean editar(Cursos curso) throws SQLException {
+        String Sql="update Cursos set Cupo_Maximo = ? where Id= ? ";
+        try (Connection conexion= cn.Connect();
+             PreparedStatement ps = (conexion.prepareStatement(Sql))){
+             ps.setInt(1, curso.getCupo_Maximo());
+             ps.setInt(2, curso.getId());
+
+             int filasAfectadas= ps.executeUpdate();
+             if (filasAfectadas > 0 ){
+                 System.out.println("Curso modificado con éxito");
+                 return true;
+             }
+             else {
+                 System.out.println("Error al modificar el curso");
+             }
+        } catch (SQLException exception) {
+        JOptionPane.showMessageDialog(null, "Error al modificar curso");
+        }
+        return false;
     }
     public boolean probarConexion() {
         String url = "jdbc:mysql://localhost:3307/BdAlumnos"; // Ajusta según tu base de datos

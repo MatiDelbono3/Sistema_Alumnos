@@ -20,9 +20,11 @@ public class RegistroCursos extends javax.swing.JFrame {
     org.example.DTO.Cursos curso=new org.example.DTO.Cursos();
     DefaultTableModel ModeloCurso=new DefaultTableModel();
 
+    private JTextField IdTxt;
     private JTextField NombreTxt;
     private JTextField NivelTxt;
     private JTextField CupoTxt;
+    private JTextField NuevoCupoTxt;
     private JTable TablaCursos;
 
 
@@ -30,7 +32,7 @@ public class RegistroCursos extends javax.swing.JFrame {
 
     public RegistroCursos() {
         setTitle("Registro Cursos");
-        setSize(400,300);
+        setSize(600,500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         initComponents();
@@ -57,13 +59,24 @@ public class RegistroCursos extends javax.swing.JFrame {
         labelNivel.setFont(new Font("Arial", Font.BOLD, 14));
 
         JLabel labelCupo = new JLabel("Cupo");
-        labelCupo.setFont(new Font("Arial", Font.BOLD, 14));
+        labelCupo.setFont(new Font("Arial", Font.BOLD, 10));
+
+        JLabel labelIdCurso = new JLabel("ID del Curso: ");
+        JLabel idCursoSeleccionado = new JLabel(""); // Curso seleccionado para modificar
+
+        JLabel labelnuevoCupo=new JLabel("Nuevo cupo");
+        labelnuevoCupo.setFont(new Font("Arial", Font.BOLD, 10));
 
 
+
+        IdTxt=new JTextField(10);
         NombreTxt = new JTextField(10);
         NivelTxt = new JTextField(10);
         CupoTxt = new JTextField(10);
+        NuevoCupoTxt=new JTextField(10);
 
+        labelnuevoCupo.setVisible(false);
+        NuevoCupoTxt.setVisible(false);
         // botones
         JButton botonRegistroCurso=new JButton("Registrar Curso");
         botonRegistroCurso.setFont(new Font("Arial", Font.BOLD, 14));
@@ -73,6 +86,14 @@ public class RegistroCursos extends javax.swing.JFrame {
         botonRegistroCurso.setBorderPainted(false);
         botonRegistroCurso.setPreferredSize(new Dimension(120,35));
 
+        JButton botonModificarCurso=new JButton("Modificar Curso");
+        botonModificarCurso.setFont(new Font("Arial", Font.BOLD, 14));
+        botonModificarCurso.setBackground(new Color(51, 153, 255));
+        botonModificarCurso.setForeground(Color.WHITE);
+        botonModificarCurso.setFocusPainted(false);
+        botonModificarCurso.setBorderPainted(false);
+        botonModificarCurso.setPreferredSize(new Dimension(120,35));
+
 
 
         PanelRegistro.add(labelNombre);
@@ -81,10 +102,18 @@ public class RegistroCursos extends javax.swing.JFrame {
         PanelRegistro.add(NivelTxt);
         PanelRegistro.add(labelCupo);
         PanelRegistro.add(CupoTxt);
+        PanelRegistro.add(labelIdCurso);
+        PanelRegistro.add(idCursoSeleccionado);
+        PanelRegistro.add(labelnuevoCupo);
+        PanelRegistro.add(NuevoCupoTxt);
         PanelRegistro.add(botonRegistroCurso);
+        PanelRegistro.add(botonModificarCurso);
+
         // Panel para la tabla
         JPanel PanelTabla = new JPanel(new BorderLayout());
         PanelTabla.setBorder(BorderFactory.createTitledBorder("Lista de Cursos"));
+        PanelTabla.setBackground(Color.LIGHT_GRAY);
+
 
         ModeloCurso = new DefaultTableModel(new String[]{"id", "nombre_curso", "nivel", "cupo_maximo"}, 0);
         TablaCursos = new JTable(ModeloCurso);
@@ -95,11 +124,12 @@ public class RegistroCursos extends javax.swing.JFrame {
         add(PanelTabla, BorderLayout.CENTER);
 
         // Estilos de texto
+        IdTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         NombreTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         NivelTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         CupoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-
-        //Crear
+        NuevoCupoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        //Logica de los botones
         botonRegistroCurso.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -118,6 +148,67 @@ public class RegistroCursos extends javax.swing.JFrame {
                 }
             }
         });
+        TablaCursos.getSelectionModel().addListSelectionListener(e ->{
+            if (!e.getValueIsAdjusting()) {
+                int FilaSeleccionada=TablaCursos.getSelectedRow();
+            if (FilaSeleccionada != -1 ){
+                int IdCursoSeleccionado= (int) TablaCursos.getValueAt(FilaSeleccionada, 0);
+                if (IdCursoSeleccionado > 0) {
+                    curso.setId(IdCursoSeleccionado);
+                    labelIdCurso.setVisible(true);
+                    labelnuevoCupo.setVisible(true);
+                    NuevoCupoTxt.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Error al obtener el ID del curso");
+                }
+            }
+            }
+        });
+        botonModificarCurso.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                NombreTxt.setEnabled(false);
+                NivelTxt.setEnabled(false);
+                CupoTxt.setEnabled(false);
+                labelnuevoCupo.setVisible(true);
+                NuevoCupoTxt.setVisible(true);
+                int fila=TablaCursos.getSelectedRow();
+                if (fila==-1 ){
+                    JOptionPane.showMessageDialog(null, "Seleccione un curso");
+                    return;
+                }
+                String nuevoCupo= NuevoCupoTxt.getText();
+                try{
+                    if (nuevoCupo.isEmpty()){
+                        JOptionPane.showMessageDialog(null, "Error al obtener el ID del curso");
+                        return;
+                    }
+                } catch (HeadlessException ex) {
+                    throw new RuntimeException(ex);
+                }
+                try{
+                    curso.setCupo_Maximo(Integer.parseInt(nuevoCupo));
+
+                        if (CC.editar(curso) ){
+                            JOptionPane.showMessageDialog(null, "curso modificado con éxito");
+                            limpiarDatosCurso();
+                        }
+                        else {
+                            JOptionPane.showConfirmDialog(null, "error al modificar el curso");
+                        }
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
+                try {
+                    ModeloCurso.setRowCount(0);
+                    ListarCursos();
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
+
     }
     private void ListarCursos() throws SQLException {
         List<Cursos>ListaCursos=CC.ListarCursos();
@@ -132,12 +223,19 @@ public class RegistroCursos extends javax.swing.JFrame {
         }
         TablaCursos.setModel(ModeloCurso);
     }
+
     void limpiarDatosCurso(){
         NombreTxt.setText("");
         NivelTxt.setText("");
         CupoTxt.setText("");
 
+        NombreTxt.setEnabled(true);
+        NivelTxt.setEnabled(true);
+        CupoTxt.setEnabled(true);
+
+        NuevoCupoTxt.setVisible(false);
     }
+
 
 
 

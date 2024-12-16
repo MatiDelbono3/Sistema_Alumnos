@@ -29,7 +29,7 @@ public class Login extends javax.swing.JFrame {
         labelUsuario.setFont(new Font("Arial", Font.BOLD, 14));
 
         JLabel labelPassword =new JLabel("password");
-        labelUsuario.setFont(new Font("Arial", Font.BOLD, 14));
+        labelPassword.setFont(new Font("Arial", Font.BOLD, 14));
 
 
 
