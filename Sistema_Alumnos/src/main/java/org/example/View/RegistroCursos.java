@@ -1,5 +1,6 @@
 package org.example.View;
 
+import jakarta.persistence.Id;
 import org.example.Connections.CursoConnection;
 import org.example.Connections.UsersConnection;
 import org.example.DTO.Cursos;
@@ -24,6 +25,7 @@ public class RegistroCursos extends javax.swing.JFrame {
     private JTextField NombreTxt;
     private JTextField NivelTxt;
     private JTextField CupoTxt;
+    private JTextField CursoAEliminarTxt;
     private JTextField NuevoCupoTxt;
     private JTable TablaCursos;
 
@@ -36,11 +38,7 @@ public class RegistroCursos extends javax.swing.JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         initComponents();
-        try {
-            ListarCursos();
-        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-        }
+        ListarCursos();
     }
     private void initComponents(){
         setLayout(new BorderLayout());
@@ -59,14 +57,16 @@ public class RegistroCursos extends javax.swing.JFrame {
         labelNivel.setFont(new Font("Arial", Font.BOLD, 14));
 
         JLabel labelCupo = new JLabel("Cupo");
-        labelCupo.setFont(new Font("Arial", Font.BOLD, 10));
+        labelCupo.setFont(new Font("Arial", Font.BOLD, 14));
 
         JLabel labelIdCurso = new JLabel("ID del Curso: ");
         JLabel idCursoSeleccionado = new JLabel(""); // Curso seleccionado para modificar
 
         JLabel labelnuevoCupo=new JLabel("Nuevo cupo");
-        labelnuevoCupo.setFont(new Font("Arial", Font.BOLD, 10));
+        labelnuevoCupo.setFont(new Font("Arial", Font.BOLD, 14));
 
+        JLabel labelCursoAEliminar=new JLabel("Curso a eliminar");
+        labelnuevoCupo.setFont(new Font("Arial", Font.BOLD, 14));
 
 
         IdTxt=new JTextField(10);
@@ -74,6 +74,8 @@ public class RegistroCursos extends javax.swing.JFrame {
         NivelTxt = new JTextField(10);
         CupoTxt = new JTextField(10);
         NuevoCupoTxt=new JTextField(10);
+        CursoAEliminarTxt=new JTextField(10);
+
 
         labelnuevoCupo.setVisible(false);
         NuevoCupoTxt.setVisible(false);
@@ -94,6 +96,13 @@ public class RegistroCursos extends javax.swing.JFrame {
         botonModificarCurso.setBorderPainted(false);
         botonModificarCurso.setPreferredSize(new Dimension(120,35));
 
+        JButton botonEliminarCurso=new JButton("Eliminar Curso");
+        botonEliminarCurso.setFont(new Font("Arial", Font.BOLD, 14));
+        botonEliminarCurso.setBackground(new Color(51, 153, 255));
+        botonEliminarCurso.setForeground(Color.WHITE);
+        botonEliminarCurso.setFocusPainted(false);
+        botonEliminarCurso.setBorderPainted(false);
+        botonEliminarCurso.setPreferredSize(new Dimension(120,35));
 
 
         PanelRegistro.add(labelNombre);
@@ -108,6 +117,7 @@ public class RegistroCursos extends javax.swing.JFrame {
         PanelRegistro.add(NuevoCupoTxt);
         PanelRegistro.add(botonRegistroCurso);
         PanelRegistro.add(botonModificarCurso);
+        PanelRegistro.add(botonEliminarCurso);
 
         // Panel para la tabla
         JPanel PanelTabla = new JPanel(new BorderLayout());
@@ -129,6 +139,7 @@ public class RegistroCursos extends javax.swing.JFrame {
         NivelTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         CupoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         NuevoCupoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        CursoAEliminarTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         //Logica de los botones
         botonRegistroCurso.addActionListener(new ActionListener() {
             @Override
@@ -141,7 +152,7 @@ public class RegistroCursos extends javax.swing.JFrame {
 
                 if (CC.insertar(curso) >0 ){
                     JOptionPane.showMessageDialog(null, "curso registrado con éxito");
-                    limpiarDatosCurso();
+                    ListarCursos();
                 }
                 else {
                     JOptionPane.showConfirmDialog(null, "error al registrar el curso");
@@ -153,11 +164,14 @@ public class RegistroCursos extends javax.swing.JFrame {
                 int FilaSeleccionada=TablaCursos.getSelectedRow();
             if (FilaSeleccionada != -1 ){
                 int IdCursoSeleccionado= (int) TablaCursos.getValueAt(FilaSeleccionada, 0);
+                idCursoSeleccionado.setText(String.valueOf(IdCursoSeleccionado));
+                CursoAEliminarTxt.setText(String.valueOf(IdCursoSeleccionado));
                 if (IdCursoSeleccionado > 0) {
                     curso.setId(IdCursoSeleccionado);
                     labelIdCurso.setVisible(true);
                     labelnuevoCupo.setVisible(true);
                     NuevoCupoTxt.setVisible(true);
+
                 } else {
                     JOptionPane.showMessageDialog(null, "Error al obtener el ID del curso");
                 }
@@ -191,6 +205,7 @@ public class RegistroCursos extends javax.swing.JFrame {
 
                         if (CC.editar(curso) ){
                             JOptionPane.showMessageDialog(null, "curso modificado con éxito");
+                            ListarCursos();
                             limpiarDatosCurso();
                         }
                         else {
@@ -200,19 +215,39 @@ public class RegistroCursos extends javax.swing.JFrame {
                         throw new RuntimeException(ex);
                     }
 
-                try {
-                    ModeloCurso.setRowCount(0);
+                ListarCursos();
+            }
+        });
+
+        botonEliminarCurso.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (CursoAEliminarTxt.getText().isEmpty()){
+                    JOptionPane.showMessageDialog(null, "Error al obtener el ID del curso");
+                }
+                curso.setId(Integer.parseInt(CursoAEliminarTxt.getText()));
+                if (CC.eliminar(curso) ){
+                    JOptionPane.showMessageDialog(null, "curso eliminado con éxito");
                     ListarCursos();
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
+                    limpiarDatosCurso();
+
+                }
+                else {
+                    JOptionPane.showConfirmDialog(null, "error al eliminar el curso");
                 }
             }
         });
 
     }
-    private void ListarCursos() throws SQLException {
-        List<Cursos>ListaCursos=CC.ListarCursos();
-        ModeloCurso= (DefaultTableModel) TablaCursos.getModel();
+    private void ListarCursos()  {
+                        List<Cursos>ListaCursos= null;
+                        try {
+                            ListaCursos = CC.ListarCursos();
+                        } catch (SQLException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        ModeloCurso.setRowCount(0);
+                        ModeloCurso= (DefaultTableModel) TablaCursos.getModel();
         Object[] Objeto =new Object[4];
         for (int i=0; i<ListaCursos.size();i++){
             Objeto[0]=ListaCursos.get(i).getId();
@@ -243,6 +278,8 @@ public class RegistroCursos extends javax.swing.JFrame {
         SwingUtilities.invokeLater(() ->
                 new MenuPrincipal().setVisible(true));
     }
-}
 
+
+
+    }
 

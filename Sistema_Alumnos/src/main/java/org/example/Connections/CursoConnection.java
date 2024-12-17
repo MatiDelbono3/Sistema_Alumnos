@@ -15,8 +15,9 @@ public class CursoConnection {
 
         try (Connection conexion= cn.Connect();
             PreparedStatement ps = ((Connection) conexion).prepareStatement(sql)){
-            ps.setInt(1, curso.getCupo_Maximo());
-            ps.setInt(2, curso.getId());
+            ps.setString(1, curso.getNombre_curso());
+            ps.setString(2, curso.getNivel());
+            ps.setInt(3, curso.getCupo_Maximo() );
 
 
             int n=ps.executeUpdate();
@@ -68,7 +69,28 @@ public class CursoConnection {
         }
         return false;
     }
-    public boolean probarConexion() {
+    public boolean eliminar(Cursos curso){
+        String sql="delete from cursos where Id =?";
+        try (Connection conexion= cn.Connect();
+             PreparedStatement ps = (conexion.prepareStatement(sql))){
+            ps.setInt(1, curso.getCupo_Maximo());
+            ps.setInt(2, curso.getId());
+
+            int filasAfectadas= ps.executeUpdate();
+            if (filasAfectadas > 0 ){
+                System.out.println("Curso modificado con éxito");
+                return true;
+            }
+            else {
+                System.out.println("Error al modificar el curso");
+
+            }
+    } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al eliminar el curso");
+        }
+        return false;
+    }
+        public boolean probarConexion() {
         String url = "jdbc:mysql://localhost:3307/BdAlumnos"; // Ajusta según tu base de datos
         String usuario = "root";
         String contrasena = "123456";
