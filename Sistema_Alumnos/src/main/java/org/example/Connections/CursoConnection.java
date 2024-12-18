@@ -73,16 +73,15 @@ public class CursoConnection {
         String sql="delete from cursos where Id =?";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = (conexion.prepareStatement(sql))){
-            ps.setInt(1, curso.getCupo_Maximo());
-            ps.setInt(2, curso.getId());
+            ps.setInt(1, curso.getId());
 
             int filasAfectadas= ps.executeUpdate();
             if (filasAfectadas > 0 ){
-                System.out.println("Curso modificado con éxito");
+                System.out.println("Curso eliminado con éxito");
                 return true;
             }
             else {
-                System.out.println("Error al modificar el curso");
+                System.out.println("Error al eliminar el curso");
 
             }
     } catch (SQLException e) {
