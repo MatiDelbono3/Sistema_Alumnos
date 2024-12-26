@@ -84,11 +84,34 @@ public class CursoConnection {
                 System.out.println("Error al eliminar el curso");
 
             }
-    } catch (SQLException e) {
+        } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Error al eliminar el curso");
         }
         return false;
     }
+    public boolean Buscar(Cursos curso){
+        String Sql="select Id, nombre_curso, nivel, cupo_maximo from Cursos  where Id= ? ";
+        try (Connection conexion= cn.Connect();
+             PreparedStatement ps = (conexion.prepareStatement(Sql))){
+             ps.setInt(1, curso.getId());
+             ResultSet rs=ps.executeQuery();
+            if (rs. next() ){
+                curso.setId(rs.getInt(1));
+                curso.setNombre_curso(rs.getString(2));
+                curso.setNivel(rs.getString(3));
+                curso.setCupo_Maximo(rs.getInt(4));
+                return true;
+            }
+            else {
+                System.out.println("Curso no encontrado");
+                return false;
+            }
+        } catch (SQLException exception) {
+            JOptionPane.showMessageDialog(null, "Curso no encontrado");
+        }
+        return false;
+    }
+
         public boolean probarConexion() {
         String url = "jdbc:mysql://localhost:3307/BdAlumnos"; // Ajusta según tu base de datos
         String usuario = "root";

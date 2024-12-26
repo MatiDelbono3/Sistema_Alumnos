@@ -27,6 +27,7 @@ public class RegistroCursos extends javax.swing.JFrame {
     private JTextField CupoTxt;
     private JTextField CursoAEliminarTxt;
     private JTextField NuevoCupoTxt;
+    private JTextField CursoABuscarTxt;
     private JTable TablaCursos;
 
 
@@ -68,6 +69,9 @@ public class RegistroCursos extends javax.swing.JFrame {
         JLabel labelCursoAEliminar=new JLabel("Curso a eliminar");
         labelnuevoCupo.setFont(new Font("Arial", Font.BOLD, 14));
 
+        JLabel labelCursoABuscar=new JLabel("Id a buscar");
+        labelnuevoCupo.setFont(new Font("Arial", Font.BOLD, 14));
+
 
         IdTxt=new JTextField(10);
         NombreTxt = new JTextField(10);
@@ -75,10 +79,13 @@ public class RegistroCursos extends javax.swing.JFrame {
         CupoTxt = new JTextField(10);
         NuevoCupoTxt=new JTextField(10);
         CursoAEliminarTxt=new JTextField(10);
-
+        CursoABuscarTxt=new JTextField(10);
 
         labelnuevoCupo.setVisible(false);
         NuevoCupoTxt.setVisible(false);
+
+        labelCursoABuscar.setVisible(true);
+        CursoABuscarTxt.setVisible(true);
         // botones
         JButton botonRegistroCurso=new JButton("Registrar Curso");
         botonRegistroCurso.setFont(new Font("Arial", Font.BOLD, 14));
@@ -104,6 +111,14 @@ public class RegistroCursos extends javax.swing.JFrame {
         botonEliminarCurso.setBorderPainted(false);
         botonEliminarCurso.setPreferredSize(new Dimension(120,35));
 
+        JButton botonBuscarCurso=new JButton("Buscar Curso");
+        botonBuscarCurso.setFont(new Font("Arial", Font.BOLD, 14));
+        botonBuscarCurso.setBackground(new Color(51, 153, 255));
+        botonBuscarCurso.setForeground(Color.WHITE);
+        botonBuscarCurso.setFocusPainted(false);
+        botonBuscarCurso.setBorderPainted(false);
+        botonBuscarCurso.setPreferredSize(new Dimension(120,35));
+
 
         PanelRegistro.add(labelNombre);
         PanelRegistro.add(NombreTxt);
@@ -115,9 +130,12 @@ public class RegistroCursos extends javax.swing.JFrame {
         PanelRegistro.add(idCursoSeleccionado);
         PanelRegistro.add(labelnuevoCupo);
         PanelRegistro.add(NuevoCupoTxt);
+        PanelRegistro.add(labelCursoABuscar);
+        PanelRegistro.add(CursoABuscarTxt);
         PanelRegistro.add(botonRegistroCurso);
         PanelRegistro.add(botonModificarCurso);
         PanelRegistro.add(botonEliminarCurso);
+        PanelRegistro.add(botonBuscarCurso);
 
         // Panel para la tabla
         JPanel PanelTabla = new JPanel(new BorderLayout());
@@ -153,6 +171,7 @@ public class RegistroCursos extends javax.swing.JFrame {
                 if (CC.insertar(curso) >0 ){
                     JOptionPane.showMessageDialog(null, "curso registrado con éxito");
                     ListarCursos();
+                    limpiarDatosCurso();
                 }
                 else {
                     JOptionPane.showConfirmDialog(null, "error al registrar el curso");
@@ -218,7 +237,6 @@ public class RegistroCursos extends javax.swing.JFrame {
                 ListarCursos();
             }
         });
-
         botonEliminarCurso.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -229,14 +247,36 @@ public class RegistroCursos extends javax.swing.JFrame {
                 if (CC.eliminar(curso) ){
                     JOptionPane.showMessageDialog(null, "curso eliminado con éxito");
                     ListarCursos();
-                    limpiarDatosCurso();
-
                 }
                 else {
                     JOptionPane.showConfirmDialog(null, "error al eliminar el curso");
                 }
             }
         });
+        botonBuscarCurso.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (CursoABuscarTxt.getText().isEmpty()){
+                    JOptionPane.showMessageDialog(null, "Error al obtener el ID del curso");
+                    return;
+                }
+                curso.setId(Integer.parseInt(CursoABuscarTxt.getText()));
+                if (CC.Buscar(curso)){
+                    IdTxt.setText(String.valueOf(curso.getId()));
+                    NombreTxt.setText(curso.getNombre_curso());
+                    NivelTxt.setText(curso.getNivel());
+                    CupoTxt.setText(String.valueOf(curso.getCupo_Maximo()));
+                }
+                else {
+                    JOptionPane.showConfirmDialog(null, "curso no encontrado");
+                    IdTxt.setText("");
+                    NombreTxt.setText("");
+                    NivelTxt.setText("");
+                    CupoTxt.setText("");
+                }
+            }
+        });
+
 
     }
     private void ListarCursos()  {
