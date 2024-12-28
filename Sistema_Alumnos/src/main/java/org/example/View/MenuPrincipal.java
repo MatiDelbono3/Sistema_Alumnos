@@ -51,6 +51,14 @@ public class MenuPrincipal extends javax.swing.JFrame {
         botonCursos.setBorderPainted(false);
         botonCursos.setPreferredSize(new Dimension(150,35));
 
+        JButton botonAlumnos=new JButton("Alumnos");
+        botonAlumnos.setFont(new Font("Arial",Font.BOLD, 14));
+        botonAlumnos.setBackground(new Color(51, 153, 255));
+        botonAlumnos.setForeground(Color.WHITE);
+        botonAlumnos.setFocusPainted(false);
+        botonAlumnos.setBorderPainted(false);
+        botonAlumnos.setPreferredSize(new Dimension(150,35));
+
 
 
         JButton botonInscripciones=new JButton("Inscripciones");
@@ -85,6 +93,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         panelBotones.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10)); // Disposición vertical
         panelBotones.setBackground(Color.GREEN);
         panelBotones.add(botonCursos);
+        panelBotones.add(botonAlumnos);
         panelBotones.add(botonInscripciones);
         panelBotones.add(botonProfesores);
 
@@ -103,6 +112,14 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
             }
     });
+        botonAlumnos.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RegistroAlumnos Alu = null;
+                Alu=new RegistroAlumnos();
+                Alu.setVisible(true);
+            }
+        });
 
     }
     void limpiarDatosCurso(){
