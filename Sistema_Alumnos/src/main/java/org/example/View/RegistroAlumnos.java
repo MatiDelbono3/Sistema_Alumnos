@@ -35,10 +35,11 @@ public class RegistroAlumnos extends javax.swing.JFrame {
 
     public RegistroAlumnos(){
         setTitle("Registro Alumnos");
-        setSize(600,500);
+        setSize(700,600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         initComponents();
+        ListarAlumnos();
     }
     private void initComponents(){
         setLayout(new BorderLayout());
@@ -98,7 +99,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         PanelTablaAlumnos.setBorder(BorderFactory.createTitledBorder("Lista de Alumnos"));
         PanelTablaAlumnos.setBackground(Color.LIGHT_GRAY);
 
-        ModeloAlumno = new DefaultTableModel(new String[]{"Id", "Nombre", "Apellido", "Fecha_Nacimiento, Correo_electronico, Fecha_Inscripcion"}, 0);
+        ModeloAlumno = new DefaultTableModel(new String[]{"Id", "Nombre", "Apellido", "Fecha_Nacimiento", "Correo_electronico", "Fecha_Inscripcion"}, 0);
         TablaAlumnos = new JTable(ModeloAlumno);
         JScrollPane scrollTabla = new JScrollPane(TablaAlumnos);
         PanelTablaAlumnos.add(scrollTabla, BorderLayout.CENTER);

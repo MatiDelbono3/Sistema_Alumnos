@@ -44,8 +44,8 @@ public class Alumnos {
         Apellido = apellido;
     }
 
-    public java.sql.Date getFecha_Nacimiento() {
-        return (java.sql.Date) Fecha_Nacimiento;
+    public Date getFecha_Nacimiento() {
+        return  Fecha_Nacimiento;
     }
 
     public void setFecha_Nacimiento(Date fecha_Nacimiento) {
@@ -60,8 +60,8 @@ public class Alumnos {
         Correo_electronico = correo_electronico;
     }
 
-    public java.sql.Date getFecha_Inscripcion() {
-        return (java.sql.Date) Fecha_Inscripcion;
+    public Date getFecha_Inscripcion() {
+        return  Fecha_Inscripcion;
     }
 
     public void setFecha_Inscripcion(Date fecha_Inscripcion) {
