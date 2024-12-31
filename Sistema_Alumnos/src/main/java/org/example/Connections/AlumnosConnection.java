@@ -13,7 +13,7 @@ import java.util.List;
 public class AlumnosConnection {
     private final Connections cn=new Connections();
     public int insertarAlumnos(Alumnos alumno){
-        String Sql="insert into estudiantes (Nombre, Apellido, Fecha_Nacimiento, Correo_electronico, Fecha_Inscripcion VALUES (?, ?, ?, ?, ?)";
+        String Sql="insert into estudiantes (Nombre, Apellido, Fecha_Nacimiento, Correo_electronico, Fecha_Inscripcion) VALUES (?, ?, ?, ?, ?)";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ((Connection) conexion).prepareStatement(Sql)){
              ps.setString(1, alumno.getNombre());
@@ -52,5 +52,24 @@ public class AlumnosConnection {
         JOptionPane.showMessageDialog(null, "Error al listar alumnos");
     }
         return ListaAlumnos;
+    }
+    public boolean editarAlumno(Alumnos alumno) throws SQLException{
+        String sql ="update estudiantes set Correo_electronico = ? where Id= ?";
+        try (Connection conexion= cn.Connect();
+             PreparedStatement ps = (conexion.prepareStatement(sql))){
+            ps.setString(1, alumno.getCorreo_electronico());
+            ps.setInt(2, alumno.getId());
+            int filasAfectadas=ps.executeUpdate();
+            if (filasAfectadas > 0){
+                JOptionPane.showMessageDialog(null, "modificación realizada con exito");
+                return true;
+            }
+            else {
+                JOptionPane.showMessageDialog(null, "error al realizar la modificación");
+            }
+        } catch (SQLException exception){
+            JOptionPane.showMessageDialog(null, "error al realizar la modificación");
+        }
+        return false;
     }
 }

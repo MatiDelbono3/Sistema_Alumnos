@@ -31,6 +31,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
     private JTextField FechaNacimientoTxt;
     private JTextField CorreoTxt;
     private JTextField FechaInscripcionTxt;
+    private JTextField NuevoCorreoTxt;
     private JTable TablaAlumnos;
 
     public RegistroAlumnos(){
@@ -39,6 +40,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         initComponents();
+        ListarAlumnos();
     }
     private void initComponents(){
         setLayout(new BorderLayout());
@@ -63,6 +65,14 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         JLabel labelFechaInscripcion=new JLabel("Fecha de Inscripcion");
         labelCorreo.setFont(new Font("Arial", Font.BOLD, 14));
 
+        JLabel labelIdAlumno=new JLabel("ID del alumno");
+        JLabel IdAlumnoseleccionado=new JLabel("");
+
+        JLabel labelNuevocorreo=new JLabel("Nuevo Correo electrónico");
+        labelNuevocorreo.setFont(new Font("Arial", Font.BOLD, 14));
+
+
+
         //botones
         JButton botonRegistroAlumnos=new JButton("Registrar alumno");
         botonRegistroAlumnos.setFont(new Font("Arial", Font.BOLD, 14));
@@ -72,12 +82,24 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         botonRegistroAlumnos.setBorderPainted(false);
         botonRegistroAlumnos.setPreferredSize(new Dimension(120,35));
 
+        JButton botonEdicionAlumnos=new JButton("editar");
+        botonEdicionAlumnos.setFont(new Font("Arial", Font.BOLD, 14));
+        botonEdicionAlumnos.setBackground(new Color(51, 153, 255));
+        botonEdicionAlumnos.setForeground(Color.WHITE);
+        botonEdicionAlumnos.setFocusPainted(false);
+        botonEdicionAlumnos.setBorderPainted(false);
+        botonEdicionAlumnos.setPreferredSize(new Dimension(120,35));
+
         IdTxt=new JTextField(10);
         NombreTxt=new JTextField(10);
         ApellidoTxt=new JTextField(10);
         FechaNacimientoTxt=new JTextField(10);
         CorreoTxt=new JTextField(10);
         FechaInscripcionTxt=new JTextField(10);
+        NuevoCorreoTxt=new JTextField(10);
+
+        labelNuevocorreo.setVisible(false);
+        NuevoCorreoTxt.setVisible(false);
 
         //Agregar elementos al panel
         PanelRegistroAlumnos.add(labelNombre);
@@ -90,15 +112,17 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         PanelRegistroAlumnos.add(CorreoTxt);
         PanelRegistroAlumnos.add(labelFechaInscripcion);
         PanelRegistroAlumnos.add(FechaInscripcionTxt);
+        PanelRegistroAlumnos.add(labelIdAlumno);
+        PanelRegistroAlumnos.add(labelNuevocorreo);
+        PanelRegistroAlumnos.add(NuevoCorreoTxt);
         PanelRegistroAlumnos.add(botonRegistroAlumnos);
-
-
+        PanelRegistroAlumnos.add(botonEdicionAlumnos);
         // Panel para la tabla
         JPanel PanelTablaAlumnos = new JPanel(new BorderLayout());
         PanelTablaAlumnos.setBorder(BorderFactory.createTitledBorder("Lista de Alumnos"));
         PanelTablaAlumnos.setBackground(Color.LIGHT_GRAY);
 
-        ModeloAlumno = new DefaultTableModel(new String[]{"Id", "Nombre", "Apellido", "Fecha_Nacimiento, Correo_electronico, Fecha_Inscripcion"}, 0);
+        ModeloAlumno = new DefaultTableModel(new String[]{"Id", "Nombre", "Apellido", "Fecha_Nacimiento", "Correo_electronico", "Fecha_Inscripcion"}, 0);
         TablaAlumnos = new JTable(ModeloAlumno);
         JScrollPane scrollTabla = new JScrollPane(TablaAlumnos);
         PanelTablaAlumnos.add(scrollTabla, BorderLayout.CENTER);
@@ -113,6 +137,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         FechaNacimientoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         CorreoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         FechaInscripcionTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        NuevoCorreoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 
         // Lógica de los botones
         botonRegistroAlumnos.addActionListener(new ActionListener() {
@@ -141,10 +166,62 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                 if (AC.insertarAlumnos(alumno) > 0){
                     JOptionPane.showMessageDialog(null, "Alumno registrado con exito");
                     ListarAlumnos();
+                    limpiarDatosAlumno();
                 }
                 else {
                     JOptionPane.showMessageDialog(null, "error al registrar el alumno");
                 }
+            }
+        });
+        TablaAlumnos.getSelectionModel().addListSelectionListener(e ->{
+            if (!e.getValueIsAdjusting()) {
+                int FilaSeleccionada=TablaAlumnos.getSelectedRow();
+                if (FilaSeleccionada != -1){
+                    int IdAlumnoSeleccionado= (int) TablaAlumnos.getValueAt(FilaSeleccionada, 0);
+                    IdAlumnoseleccionado.setText(String.valueOf(IdAlumnoSeleccionado));
+                    if (IdAlumnoSeleccionado > 0){
+                        alumno.setId(IdAlumnoSeleccionado);
+                        labelNuevocorreo.setVisible(true);
+                        NuevoCorreoTxt.setVisible(true);
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(null, "error al obtener el ID del alumno");
+                    }
+                }
+            }
+        });
+        botonEdicionAlumnos.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                NombreTxt.setEnabled(false);
+                ApellidoTxt.setEnabled(false);
+                FechaNacimientoTxt.setEnabled(false);
+                CorreoTxt.setEnabled(false);
+                FechaInscripcionTxt.setEnabled(false);
+                int fila=TablaAlumnos.getSelectedRow();
+                if (fila == -1){
+                    JOptionPane.showMessageDialog(null, "seleccione un alumno");
+                    return;
+                }
+                String nuevoCorreo= NuevoCorreoTxt.getText();
+                try{
+                    if (nuevoCorreo.isEmpty()){
+                        JOptionPane.showMessageDialog(null, "Error al obtener el ID del alumno");
+
+                    }
+                } catch (HeadlessException ex) {
+                    throw new RuntimeException(ex);
+                }
+                try {
+                alumno.setCorreo_electronico(nuevoCorreo);
+                if (AC.editarAlumno(alumno)){
+                JOptionPane.showMessageDialog(null, "modificacion realizada con exito");
+                ListarAlumnos();
+            }
+        } catch (SQLException exception){
+                    throw new RuntimeException(exception);
+                }
+
             }
         });
     }
@@ -169,7 +246,23 @@ public class RegistroAlumnos extends javax.swing.JFrame {
             }
             TablaAlumnos.setModel(ModeloAlumno);
         }
+        public void limpiarDatosAlumno(){
+            NombreTxt.setText("");
+            ApellidoTxt.setText("");
+            FechaNacimientoTxt.setText("");
+            CorreoTxt.setText("");
+            FechaInscripcionTxt.setText("");
 
+            NombreTxt.setVisible(true);
+            ApellidoTxt.setVisible(true);
+            FechaNacimientoTxt.setVisible(true);
+            CorreoTxt.setVisible(true);
+            FechaInscripcionTxt.setVisible(true);
+        }
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() ->
+                new MenuPrincipal().setVisible(true));
+    }
         }
 
 
