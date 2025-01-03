@@ -316,7 +316,7 @@ public class RegistroCursos extends javax.swing.JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() ->
-                new MenuPrincipal().setVisible(true));
+                new RegistroCursos().setVisible(true));
     }
 
 

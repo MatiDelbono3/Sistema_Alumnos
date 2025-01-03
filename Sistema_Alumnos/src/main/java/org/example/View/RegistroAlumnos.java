@@ -36,7 +36,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
 
     public RegistroAlumnos(){
         setTitle("Registro Alumnos");
-        setSize(600,500);
+        setSize(1100,900);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         initComponents();
@@ -113,6 +113,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         PanelRegistroAlumnos.add(labelFechaInscripcion);
         PanelRegistroAlumnos.add(FechaInscripcionTxt);
         PanelRegistroAlumnos.add(labelIdAlumno);
+        PanelRegistroAlumnos.add(IdAlumnoseleccionado);
         PanelRegistroAlumnos.add(labelNuevocorreo);
         PanelRegistroAlumnos.add(NuevoCorreoTxt);
         PanelRegistroAlumnos.add(botonRegistroAlumnos);
@@ -156,12 +157,14 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "Las fechas deben tener el formato YYYY-MM-DD.", "Error", JOptionPane.ERROR_MESSAGE);
                     return; // Salir si las fechas no son válidas
                 }
+                java.sql.Date sqlFechaNacimiento = new java.sql.Date(fechaNacimiento.getTime());
+                java.sql.Date sqlFechaInscripcion = new java.sql.Date(fechaInscripcion.getTime());
 
                 alumno.setNombre(NombreTxt.getText());
                 alumno.setApellido(ApellidoTxt.getText());
-                alumno.setFecha_Nacimiento(fechaNacimiento);
+                alumno.setFecha_Nacimiento(sqlFechaNacimiento);
                 alumno.setCorreo_electronico(CorreoTxt.getText());
-                alumno.setFecha_Inscripcion(fechaInscripcion);
+                alumno.setFecha_Inscripcion(sqlFechaInscripcion);
 
                 if (AC.insertarAlumnos(alumno) > 0){
                     JOptionPane.showMessageDialog(null, "Alumno registrado con exito");
@@ -181,6 +184,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                     IdAlumnoseleccionado.setText(String.valueOf(IdAlumnoSeleccionado));
                     if (IdAlumnoSeleccionado > 0){
                         alumno.setId(IdAlumnoSeleccionado);
+                        labelIdAlumno.setVisible(true);
                         labelNuevocorreo.setVisible(true);
                         NuevoCorreoTxt.setVisible(true);
                     }
@@ -198,6 +202,8 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                 FechaNacimientoTxt.setEnabled(false);
                 CorreoTxt.setEnabled(false);
                 FechaInscripcionTxt.setEnabled(false);
+                labelIdAlumno.setVisible(true);
+                IdAlumnoseleccionado.setVisible(true);
                 int fila=TablaAlumnos.getSelectedRow();
                 if (fila == -1){
                     JOptionPane.showMessageDialog(null, "seleccione un alumno");
@@ -261,7 +267,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() ->
-                new MenuPrincipal().setVisible(true));
+                new RegistroAlumnos().setVisible(true));
     }
         }
 
