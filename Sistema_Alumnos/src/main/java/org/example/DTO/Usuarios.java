@@ -6,15 +6,18 @@ public class Usuarios {
     private String apellido;
     private String usuario;
     private String contrasena;
+    private String estado;
+    priv
     public Usuarios(){
 
     }
-    public Usuarios(int id, String nombre, String apellido, String usuario, String contrasena){
+    public Usuarios(int id, String nombre, String apellido, String usuario, String contrasena, String estado){
         this.setId(id);
         this.setNombre(nombre);
         this.setApellido(apellido);
         this.setUsuario(usuario);
         this.setContrasena(contrasena);
+        this.setEstado(estado);
     }
 
     public int getId() {
@@ -55,5 +58,13 @@ public class Usuarios {
 
     public void setContrasena(String contrasena) {
         this.contrasena = contrasena;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }

@@ -36,6 +36,25 @@ public class Connections {
             }
 
 }
+    public boolean probarConexion() {
+        String url = "jdbc:mysql://localhost:3307/BdAlumnos"; // Ajusta según tu base de datos
+        String usuario = "root";
+        String contrasena = "123456";
+
+        try (Connection connection = DriverManager.getConnection(url, usuario, contrasena)) {
+            if (connection != null) {
+                JOptionPane.showMessageDialog(null, "Conexión exitosa");
+                return true;
+            } else {
+                JOptionPane.showMessageDialog(null, "No se pudo establecer la conexión");
+                return false;
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al conectar: " + e.getMessage());
+            return false;
+        }
+    }
 }
+
 
 

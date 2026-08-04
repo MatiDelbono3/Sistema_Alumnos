@@ -1,10 +1,8 @@
 package org.example.View;
 
-import org.example.Connections.AlumnosConnection;
-import org.example.Connections.UsersConnection;
 import org.example.DTO.Alumnos;
-import org.example.DTO.Cursos;
 import org.example.DTO.Usuarios;
+import org.example.Services.AlumnoService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,15 +12,12 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
 public class RegistroAlumnos extends javax.swing.JFrame {
-    UsersConnection ConexionUsuario=new UsersConnection();
-    Usuarios usuario=new Usuarios();
-    AlumnosConnection AC=new AlumnosConnection();
-    Alumnos alumno=new Alumnos();
+
+    AlumnoService AS=new AlumnoService();
     DefaultTableModel ModeloAlumno=new DefaultTableModel();
 
     private JTextField IdTxt;
@@ -32,6 +27,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
     private JTextField CorreoTxt;
     private JTextField FechaInscripcionTxt;
     private JTextField NuevoCorreoTxt;
+    private JTextField AlumnoAEliminarTxt;
     private JTable TablaAlumnos;
 
     public RegistroAlumnos(){
@@ -71,7 +67,8 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         JLabel labelNuevocorreo=new JLabel("Nuevo Correo electrónico");
         labelNuevocorreo.setFont(new Font("Arial", Font.BOLD, 14));
 
-
+        JLabel labelAlumnoAEliminar=new JLabel("Curso a eliminar");
+        labelAlumnoAEliminar.setFont(new Font("Arial", Font.BOLD, 14));
 
         //botones
         JButton botonRegistroAlumnos=new JButton("Registrar alumno");
@@ -90,6 +87,14 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         botonEdicionAlumnos.setBorderPainted(false);
         botonEdicionAlumnos.setPreferredSize(new Dimension(120,35));
 
+        JButton botonEliminacionAlumnos=new JButton("eliminar Alumno");
+        botonEliminacionAlumnos.setFont(new Font("Arial", Font.BOLD, 14));
+        botonEliminacionAlumnos.setBackground(new Color(51, 153, 255));
+        botonEliminacionAlumnos.setForeground(Color.WHITE);
+        botonEliminacionAlumnos.setFocusPainted(false);
+        botonEliminacionAlumnos.setBorderPainted(false);
+        botonEliminacionAlumnos.setPreferredSize(new Dimension(120,35));
+
         IdTxt=new JTextField(10);
         NombreTxt=new JTextField(10);
         ApellidoTxt=new JTextField(10);
@@ -97,9 +102,12 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         CorreoTxt=new JTextField(10);
         FechaInscripcionTxt=new JTextField(10);
         NuevoCorreoTxt=new JTextField(10);
+         AlumnoAEliminarTxt = new JTextField(10);
 
         labelNuevocorreo.setVisible(false);
         NuevoCorreoTxt.setVisible(false);
+
+
 
         //Agregar elementos al panel
         PanelRegistroAlumnos.add(labelNombre);
@@ -118,6 +126,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         PanelRegistroAlumnos.add(NuevoCorreoTxt);
         PanelRegistroAlumnos.add(botonRegistroAlumnos);
         PanelRegistroAlumnos.add(botonEdicionAlumnos);
+        PanelRegistroAlumnos.add(botonEliminacionAlumnos);
         // Panel para la tabla
         JPanel PanelTablaAlumnos = new JPanel(new BorderLayout());
         PanelTablaAlumnos.setBorder(BorderFactory.createTitledBorder("Lista de Alumnos"));
@@ -139,7 +148,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         CorreoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         FechaInscripcionTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         NuevoCorreoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-
+        AlumnoAEliminarTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         // Lógica de los botones
         botonRegistroAlumnos.addActionListener(new ActionListener() {
             @Override
@@ -150,6 +159,18 @@ public class RegistroAlumnos extends javax.swing.JFrame {
 
                 Date fechaNacimiento;
                 Date fechaInscripcion;
+                if (NombreTxt.getText().isBlank()){
+                    JOptionPane.showMessageDialog(null, "Ingrese el nombre.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (ApellidoTxt.getText().isBlank()){
+                    JOptionPane.showMessageDialog(null, "Ingrese el apellido.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (CorreoTxt.getText().isBlank()){
+                    JOptionPane.showMessageDialog(null, "Ingrese el correo.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 try {
                     fechaNacimiento = dateFormat.parse(FechaNacimientoTxt.getText().trim());
                     fechaInscripcion = dateFormat.parse(FechaInscripcionTxt.getText().trim());
@@ -158,22 +179,15 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                     return; // Salir si las fechas no son válidas
                 }
                 java.sql.Date sqlFechaNacimiento = new java.sql.Date(fechaNacimiento.getTime());
-                java.sql.Date sqlFechaInscripcion = new java.sql.Date(fechaInscripcion.getTime());
-
+                Alumnos alumno=new Alumnos();
                 alumno.setNombre(NombreTxt.getText());
                 alumno.setApellido(ApellidoTxt.getText());
                 alumno.setFecha_Nacimiento(sqlFechaNacimiento);
                 alumno.setCorreo_electronico(CorreoTxt.getText());
-                alumno.setFecha_Inscripcion(sqlFechaInscripcion);
-
-                if (AC.insertarAlumnos(alumno) > 0){
-                    JOptionPane.showMessageDialog(null, "Alumno registrado con exito");
-                    ListarAlumnos();
-                    limpiarDatosAlumno();
-                }
-                else {
-                    JOptionPane.showMessageDialog(null, "error al registrar el alumno");
-                }
+                AS.registrarAlumno(alumno);
+                JOptionPane.showMessageDialog(null, "Alumno registrado con éxito");
+                ListarAlumnos();
+                limpiarDatosAlumno();
             }
         });
         TablaAlumnos.getSelectionModel().addListSelectionListener(e ->{
@@ -182,8 +196,8 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                 if (FilaSeleccionada != -1){
                     int IdAlumnoSeleccionado= (int) TablaAlumnos.getValueAt(FilaSeleccionada, 0);
                     IdAlumnoseleccionado.setText(String.valueOf(IdAlumnoSeleccionado));
+                    AlumnoAEliminarTxt.setText(String.valueOf(IdAlumnoSeleccionado));
                     if (IdAlumnoSeleccionado > 0){
-                        alumno.setId(IdAlumnoSeleccionado);
                         labelIdAlumno.setVisible(true);
                         labelNuevocorreo.setVisible(true);
                         NuevoCorreoTxt.setVisible(true);
@@ -210,6 +224,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                     return;
                 }
                 String nuevoCorreo= NuevoCorreoTxt.getText();
+                int idSeleccionado=Integer.parseInt(IdAlumnoseleccionado.getText());
                 try{
                     if (nuevoCorreo.isEmpty()){
                         JOptionPane.showMessageDialog(null, "Error al obtener el ID del alumno");
@@ -218,15 +233,44 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                 } catch (HeadlessException ex) {
                     throw new RuntimeException(ex);
                 }
-                try {
-                alumno.setCorreo_electronico(nuevoCorreo);
-                if (AC.editarAlumno(alumno)){
+                if (!nuevoCorreo.equalsIgnoreCase("")){
+                    AS.editarCorreo( idSeleccionado, nuevoCorreo);
                 JOptionPane.showMessageDialog(null, "modificacion realizada con exito");
                 ListarAlumnos();
+                limpiarDatosAlumno();
             }
-        } catch (SQLException exception){
-                    throw new RuntimeException(exception);
+
+            }
+        });
+        botonEliminacionAlumnos.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                NombreTxt.setEnabled(false);
+                ApellidoTxt.setEnabled(false);
+                FechaNacimientoTxt.setEnabled(false);
+                CorreoTxt.setEnabled(false);
+                FechaInscripcionTxt.setEnabled(false);
+                labelIdAlumno.setVisible(true);
+                IdAlumnoseleccionado.setVisible(true);
+                int fila=TablaAlumnos.getSelectedRow();
+                if (fila == -1){
+                    JOptionPane.showMessageDialog(null, "seleccione un alumno");
+                    return;
                 }
+                int idSeleccionado=Integer.parseInt(IdAlumnoseleccionado.getText());
+                try{
+                    if (!(idSeleccionado>0 )){
+                        JOptionPane.showMessageDialog(null, "Error al obtener el ID del alumno");
+
+                    }
+                } catch (HeadlessException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+               AS.eliminarAlumno(idSeleccionado);
+                JOptionPane.showMessageDialog(null, "alumno eliminado con exito");
+                ListarAlumnos();
+                limpiarDatosAlumno();
 
             }
         });
@@ -234,7 +278,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         private void ListarAlumnos(){
             List<Alumnos>ListaAlumnos=null;
             try {
-                ListaAlumnos = AC.ListarAlumnos();
+                ListaAlumnos = AS.listarAlumnos();
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
@@ -247,7 +291,6 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                 Objeto[2]=ListaAlumnos.get(i).getApellido();
                 Objeto[3]=ListaAlumnos.get(i).getFecha_Nacimiento();
                 Objeto[4]=ListaAlumnos.get(i).getCorreo_electronico();
-                Objeto[5]=ListaAlumnos.get(i).getFecha_Inscripcion();
                 ModeloAlumno.addRow(Objeto);
             }
             TablaAlumnos.setModel(ModeloAlumno);
@@ -259,16 +302,15 @@ public class RegistroAlumnos extends javax.swing.JFrame {
             CorreoTxt.setText("");
             FechaInscripcionTxt.setText("");
 
-            NombreTxt.setVisible(true);
-            ApellidoTxt.setVisible(true);
-            FechaNacimientoTxt.setVisible(true);
-            CorreoTxt.setVisible(true);
-            FechaInscripcionTxt.setVisible(true);
+            NombreTxt.setEnabled(true);
+            ApellidoTxt.setEnabled(true);
+            FechaNacimientoTxt.setEnabled(true);
+            CorreoTxt.setEnabled(true);
+            FechaInscripcionTxt.setEnabled(true);
         }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() ->
                 new RegistroAlumnos().setVisible(true));
     }
         }
-
 

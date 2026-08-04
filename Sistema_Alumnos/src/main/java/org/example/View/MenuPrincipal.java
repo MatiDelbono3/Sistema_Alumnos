@@ -1,14 +1,10 @@
 package org.example.View;
 
-import org.example.Connections.CursoConnection;
-import org.example.Connections.UsersConnection;
-import org.example.DTO.Cursos;
 import org.example.DTO.Usuarios;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 
 public class MenuPrincipal extends javax.swing.JFrame {
     UsersConnection conexionUsuario=new UsersConnection();

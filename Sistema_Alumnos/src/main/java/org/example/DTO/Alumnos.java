@@ -8,16 +8,15 @@ public class Alumnos {
     private String Apellido;
     private Date Fecha_Nacimiento;
     private String Correo_electronico;
-    private Date Fecha_Inscripcion;
+
     public Alumnos(){
 
     }
-    public Alumnos(int Id, String Nombre, String Apellido, Date Fecha_Nacimiento, String Correo_electronico, Date Fecha_Inscripcion){
+    public Alumnos(int Id, String Nombre, String Apellido, Date Fecha_Nacimiento, String Correo_electronico){
         this.setNombre(Nombre);
         this.setApellido(Apellido);
         this.setFecha_Nacimiento(Fecha_Nacimiento);
         this.setCorreo_electronico(Correo_electronico);
-        this.setFecha_Inscripcion(Fecha_Inscripcion);
     }
 
     public int getId() {
@@ -44,8 +43,8 @@ public class Alumnos {
         Apellido = apellido;
     }
 
-    public java.sql.Date getFecha_Nacimiento() {
-        return (java.sql.Date) Fecha_Nacimiento;
+    public Date getFecha_Nacimiento() {
+        return  Fecha_Nacimiento;
     }
 
     public void setFecha_Nacimiento(Date fecha_Nacimiento) {
@@ -60,11 +59,5 @@ public class Alumnos {
         Correo_electronico = correo_electronico;
     }
 
-    public java.sql.Date getFecha_Inscripcion() {
-        return (java.sql.Date) Fecha_Inscripcion;
-    }
 
-    public void setFecha_Inscripcion(Date fecha_Inscripcion) {
-        Fecha_Inscripcion = fecha_Inscripcion;
-    }
 }

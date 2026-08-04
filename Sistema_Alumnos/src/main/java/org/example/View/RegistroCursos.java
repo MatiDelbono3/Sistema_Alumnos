@@ -1,10 +1,9 @@
 package org.example.View;
 
-import jakarta.persistence.Id;
-import org.example.Connections.CursoConnection;
-import org.example.Connections.UsersConnection;
 import org.example.DTO.Cursos;
 import org.example.DTO.Usuarios;
+import org.example.Repositories.CursoDAO;
+import org.example.Services.CursoService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -15,9 +14,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class RegistroCursos extends javax.swing.JFrame {
-    UsersConnection conexionUsuario=new UsersConnection();
+
     Usuarios usuario=new Usuarios();
-    CursoConnection CC=new CursoConnection();
+    CursoService CS=new CursoService();
     org.example.DTO.Cursos curso=new org.example.DTO.Cursos();
     DefaultTableModel ModeloCurso=new DefaultTableModel();
 
@@ -65,12 +64,14 @@ public class RegistroCursos extends javax.swing.JFrame {
 
         JLabel labelnuevoCupo=new JLabel("Nuevo cupo");
         labelnuevoCupo.setFont(new Font("Arial", Font.BOLD, 14));
-
+        labelnuevoCupo.setVisible(false);
         JLabel labelCursoAEliminar=new JLabel("Curso a eliminar");
-        labelnuevoCupo.setFont(new Font("Arial", Font.BOLD, 14));
+        labelCursoAEliminar.setFont(new Font("Arial", Font.BOLD, 14));
 
         JLabel labelCursoABuscar=new JLabel("Id a buscar");
-        labelnuevoCupo.setFont(new Font("Arial", Font.BOLD, 14));
+        labelCursoABuscar.setFont(new Font("Arial", Font.BOLD, 14));
+        labelCursoABuscar.setVisible(false);
+
 
 
         IdTxt=new JTextField(10);
@@ -81,11 +82,11 @@ public class RegistroCursos extends javax.swing.JFrame {
         CursoAEliminarTxt=new JTextField(10);
         CursoABuscarTxt=new JTextField(10);
 
-        labelnuevoCupo.setVisible(false);
         NuevoCupoTxt.setVisible(false);
+        CursoABuscarTxt.setVisible(false);
 
-        labelCursoABuscar.setVisible(true);
-        CursoABuscarTxt.setVisible(true);
+
+
         // botones
         JButton botonRegistroCurso=new JButton("Registrar Curso");
         botonRegistroCurso.setFont(new Font("Arial", Font.BOLD, 14));
@@ -162,22 +163,35 @@ public class RegistroCursos extends javax.swing.JFrame {
         botonRegistroCurso.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (NombreTxt.getText().isBlank()){
+                    JOptionPane.showMessageDialog(null, "Ingrese el nombre.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (NivelTxt.getText().isBlank()){
+                    JOptionPane.showMessageDialog(null, "Ingrese el nivel.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (CupoTxt.getText().isBlank()){
+                    JOptionPane.showMessageDialog(null, "Ingrese el cupo.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+
                 curso.setNombre_curso(NombreTxt.getText());
                 curso.setNivel(NivelTxt.getText());
                 curso.setCupo_Maximo(Integer.parseInt(CupoTxt.getText()));
-                // Validación para asegurar que el campo 'Cupo' sea un número entero
 
 
-                if (CC.insertar(curso) >0 ){
-                    JOptionPane.showMessageDialog(null, "curso registrado con éxito");
-                    ListarCursos();
-                    limpiarDatosCurso();
-                }
-                else {
-                    JOptionPane.showConfirmDialog(null, "error al registrar el curso");
-                }
-            }
-        });
+                CS.registrarCurso(curso);
+
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Curso registrado con éxito");
+
+                ListarCursos();
+                limpiarDatosCurso();
+
+            }});
         TablaCursos.getSelectionModel().addListSelectionListener(e ->{
             if (!e.getValueIsAdjusting()) {
                 int FilaSeleccionada=TablaCursos.getSelectedRow();
@@ -187,6 +201,7 @@ public class RegistroCursos extends javax.swing.JFrame {
                 CursoAEliminarTxt.setText(String.valueOf(IdCursoSeleccionado));
                 if (IdCursoSeleccionado > 0) {
                     curso.setId(IdCursoSeleccionado);
+                    idCursoSeleccionado.setVisible(true);
                     labelIdCurso.setVisible(true);
                     labelnuevoCupo.setVisible(true);
                     NuevoCupoTxt.setVisible(true);
@@ -210,31 +225,28 @@ public class RegistroCursos extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "Seleccione un curso");
                     return;
                 }
-                String nuevoCupo= NuevoCupoTxt.getText();
+                int nuevoCupo= Integer.parseInt(NuevoCupoTxt.getText());
                 try{
-                    if (nuevoCupo.isEmpty()){
-                        JOptionPane.showMessageDialog(null, "Error al obtener el ID del curso");
+                    if (nuevoCupo <= 0){
+                        JOptionPane.showMessageDialog(null, "El cupo debe ser mayor a 0");
                         return;
                     }
                 } catch (HeadlessException ex) {
                     throw new RuntimeException(ex);
                 }
-                try{
-                    curso.setCupo_Maximo(Integer.parseInt(nuevoCupo));
-
-                        if (CC.editar(curso) ){
-                            JOptionPane.showMessageDialog(null, "curso modificado con éxito");
-                            ListarCursos();
-                            limpiarDatosCurso();
-                        }
-                        else {
-                            JOptionPane.showConfirmDialog(null, "error al modificar el curso");
-                        }
-                    } catch (SQLException ex) {
-                        throw new RuntimeException(ex);
-                    }
-
+                curso.setCupo_Maximo(Integer.parseInt(String.valueOf(nuevoCupo)));
+                JOptionPane.showMessageDialog(null, "curso modificado con éxito");
+                try {
+                    CS.editarCurso(curso);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
                 ListarCursos();
+                limpiarDatosCurso();
+
+                labelIdCurso.setVisible(false);
+                    idCursoSeleccionado.setVisible(false);
+
             }
         });
         botonEliminarCurso.addActionListener(new ActionListener() {
@@ -242,16 +254,16 @@ public class RegistroCursos extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (CursoAEliminarTxt.getText().isEmpty()){
                     JOptionPane.showMessageDialog(null, "Error al obtener el ID del curso");
+                    return;
                 }
                 curso.setId(Integer.parseInt(CursoAEliminarTxt.getText()));
-                if (CC.eliminar(curso) ){
+                    CS.eliminarCurso(curso);
                     JOptionPane.showMessageDialog(null, "curso eliminado con éxito");
+                    labelIdCurso.setVisible(false);
+                    idCursoSeleccionado.setVisible(false);
                     ListarCursos();
                 }
-                else {
-                    JOptionPane.showConfirmDialog(null, "error al eliminar el curso");
-                }
-            }
+
         });
         botonBuscarCurso.addActionListener(new ActionListener() {
             @Override
@@ -260,20 +272,16 @@ public class RegistroCursos extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "Error al obtener el ID del curso");
                     return;
                 }
+                CursoABuscarTxt.setVisible(true);
                 curso.setId(Integer.parseInt(CursoABuscarTxt.getText()));
-                if (CC.Buscar(curso)){
-                    IdTxt.setText(String.valueOf(curso.getId()));
-                    NombreTxt.setText(curso.getNombre_curso());
+
+                    labelCursoABuscar.setVisible(true);
+                    idCursoSeleccionado.setText(String.valueOf(curso.getId()));
+                    CS.BuscarCurso(curso);
+                NombreTxt.setText(curso.getNombre_curso());
                     NivelTxt.setText(curso.getNivel());
                     CupoTxt.setText(String.valueOf(curso.getCupo_Maximo()));
-                }
-                else {
-                    JOptionPane.showConfirmDialog(null, "curso no encontrado");
-                    IdTxt.setText("");
-                    NombreTxt.setText("");
-                    NivelTxt.setText("");
-                    CupoTxt.setText("");
-                }
+
             }
         });
 
@@ -282,7 +290,7 @@ public class RegistroCursos extends javax.swing.JFrame {
     private void ListarCursos()  {
                         List<Cursos>ListaCursos= null;
                         try {
-                            ListaCursos = CC.ListarCursos();
+                            ListaCursos = CS.listarCursos();
                         } catch (SQLException ex) {
                             throw new RuntimeException(ex);
                         }
