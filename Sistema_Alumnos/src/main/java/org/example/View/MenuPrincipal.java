@@ -1,5 +1,6 @@
 package org.example.View;
 
+import org.example.Connections.Connections;
 import org.example.DTO.Usuarios;
 import javax.swing.*;
 import java.awt.*;
@@ -7,9 +8,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MenuPrincipal extends javax.swing.JFrame {
-    UsersConnection conexionUsuario=new UsersConnection();
+    Connections conexionUsuario=new Connections();
     Usuarios usuario=new Usuarios();
-    CursoConnection CC=new CursoConnection();
+
 
     private JTextField NombreTxt;
     private JTextField NivelTxt;

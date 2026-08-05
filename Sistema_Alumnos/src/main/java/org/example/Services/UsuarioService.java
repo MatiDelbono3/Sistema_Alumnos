@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class UsuarioService {
-    private final UsuarioDAO usuarioDAO=new UsuarioDAO();
+    private UsuarioDAO usuarioDAO=new UsuarioDAO();
     public boolean RegistrarUsuario(Usuarios usuario) {
         if (usuario.getNombre().isBlank()) {
             throw new IllegalArgumentException("El nombre del usuario es obligatorio");
@@ -36,19 +36,18 @@ public class UsuarioService {
         usuarioDAO.RegistrarUsuario(usuario);
         return true;
     }
-    public void  login(int id, String contrasena){
-        Usuarios usuarioEncontrado=usuarioDAO.BuscarUsuarioPorId(id);
-        if (!usuarioDAO.existeUsuario(usuarioEncontrado.getNombre())) {
-            throw new IllegalArgumentException("El usuario buscado no existe");
+    public Usuarios login(String usuario, String contrasena){
+        Usuarios u = usuarioDAO.login(usuario, contrasena);
+
+        if (u == null) {
+            throw new IllegalArgumentException(
+                    "Usuario o contraseña incorrectos"
+            );
         }
-        if (usuarioEncontrado.getEstado().equalsIgnoreCase("Activo")){
-            throw new IllegalArgumentException("El usuario está inactivo");
-        }
-        if (!BCrypt.checkpw(contrasena, usuarioEncontrado.getContrasena())) {
-            throw new IllegalArgumentException("Usuario o contraseña incorrectos.");
-        }
+
+        return u;
     }
-    public void editarContraseña(int id, String contrasena, String nuevaContrasena){
+    public void editarContrasena(int id, String contrasena, String nuevaContrasena){
         Usuarios usuarioEncontrado=usuarioDAO.BuscarUsuarioPorId(id);
         if (!usuarioDAO.existeUsuario(usuarioEncontrado.getNombre())) {
             throw new IllegalArgumentException("El usuario buscado no existe");

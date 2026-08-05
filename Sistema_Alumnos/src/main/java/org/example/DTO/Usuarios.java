@@ -7,7 +7,6 @@ public class Usuarios {
     private String usuario;
     private String contrasena;
     private String estado;
-    priv
     public Usuarios(){
 
     }

@@ -129,7 +129,7 @@ public class Login extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String password=new String(PassTxt.getPassword());
-               usuarioService.login(Integer.parseInt(UserTxt.getText()), password);
+               Usuarios usuario=usuarioService.login(String.valueOf((UserTxt.getText())), password);
                if (usuario.getUsuario() != null && usuario.getContrasena() != null){
                    JOptionPane.showConfirmDialog(null, "Bienvenido al sistema");
                    MenuPrincipal menu=new MenuPrincipal();

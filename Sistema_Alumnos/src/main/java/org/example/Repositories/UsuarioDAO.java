@@ -108,13 +108,15 @@ public class UsuarioDAO {
         return null;
     }
     public boolean existeUsuario(String nombre){
-        String Sql="Select * from usuarios WHERE Id= ? LIMIT 1 ";
+        String Sql="Select * from usuarios WHERE Usuario= ? LIMIT 1 ";
         try (Connection conexion= cn.Connect();
-             PreparedStatement ps = ( conexion.prepareStatement(Sql));
-             ResultSet rs=ps.executeQuery()){
-            while (rs.next()){
-                ps.setString(1, nombre);
+             PreparedStatement ps = ( conexion.prepareStatement(Sql))){
+            ps.setString(1, nombre);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
             }
+
         } catch (SQLException exc){
            System.out.println("Error al verificar usuario");
         }
@@ -142,7 +144,7 @@ public class UsuarioDAO {
         }
         return ListaUsuarios;
     }
-    public boolean editarContraseña(int idUsuario, String nuevaContrasena) throws SQLException {
+    public boolean editarContrasena(int idUsuario, String nuevaContrasena) throws SQLException {
         String Sql="update Usuarios set contraseña = ? where Id= ? ";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = (conexion.prepareStatement(Sql))){
