@@ -34,11 +34,12 @@ public class CursoDAO {
     public boolean existeCurso(int idCurso){
         String Sql="Select * from cursos WHERE Id= ? LIMIT 1 ";
         try (Connection conexion= cn.Connect();
-             PreparedStatement ps = ( conexion.prepareStatement(Sql));
-             ResultSet rs=ps.executeQuery()){
-            while (rs.next()){
-                ps.setInt(1, idCurso);
-            }
+             PreparedStatement ps = ( conexion.prepareStatement(Sql))){;
+
+             ps.setInt(1, idCurso);
+        try (ResultSet rs = ps.executeQuery()) {
+            return rs.next();
+        }
         } catch (SQLException exc){
             JOptionPane.showMessageDialog(null, "Error al verificar curso");
         }
@@ -103,7 +104,7 @@ public class CursoDAO {
         }
         return false;
     }
-    public boolean BuscarCurso(Cursos curso){
+    public Cursos BuscarCurso(Cursos curso){
         String Sql="select Id, nombre_curso, nivel, cupo_maximo from Cursos  where Id= ? ";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = (conexion.prepareStatement(Sql))){
@@ -114,16 +115,16 @@ public class CursoDAO {
                 curso.setNombre_curso(rs.getString(2));
                 curso.setNivel(rs.getString(3));
                 curso.setCupo_Maximo(rs.getInt(4));
-                return true;
+                return curso;
             }
             else {
                 System.out.println("Curso no encontrado");
-                return false;
+                return null;
             }
         } catch (SQLException exception) {
             JOptionPane.showMessageDialog(null, "Curso no encontrado");
         }
-        return false;
+        return null;
     }
     }
 

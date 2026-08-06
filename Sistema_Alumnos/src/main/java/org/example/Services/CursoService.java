@@ -31,15 +31,6 @@ public class CursoService {
         if (!cursoDAO.existeCurso(curso.getId())){
             throw new IllegalArgumentException("El curso NO EXISTE");
         }
-        if (curso.getNombre_curso().isBlank()) {
-            throw new IllegalArgumentException("El nombre de curso es obligatorio");
-        }
-        if (curso.getNivel().isBlank()){
-            throw new IllegalArgumentException("El nivel del curso es obligatorio");
-        }
-        if (curso.getCupo_Maximo() <=0 ){
-            throw new IllegalArgumentException("Cupo no válido");
-        }
         cursoDAO.editarCurso(curso);
     }
     public void eliminarCurso(Cursos curso){
@@ -51,11 +42,11 @@ public class CursoService {
         }
         cursoDAO.eliminarCurso(curso);
     }
-    public void BuscarCurso(Cursos curso){
+    public Cursos BuscarCurso(Cursos curso){
         if (!cursoDAO.existeCurso(curso.getId())){
             throw new IllegalArgumentException("El curso NO EXISTE");
         }
-        cursoDAO.eliminarCurso(curso);
+        return cursoDAO.BuscarCurso(curso);
     }
 }
 

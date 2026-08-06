@@ -70,7 +70,7 @@ public class RegistroCursos extends javax.swing.JFrame {
 
         JLabel labelCursoABuscar=new JLabel("Id a buscar");
         labelCursoABuscar.setFont(new Font("Arial", Font.BOLD, 14));
-        labelCursoABuscar.setVisible(false);
+
 
 
 
@@ -83,7 +83,7 @@ public class RegistroCursos extends javax.swing.JFrame {
         CursoABuscarTxt=new JTextField(10);
 
         NuevoCupoTxt.setVisible(false);
-        CursoABuscarTxt.setVisible(false);
+
 
 
 
@@ -274,18 +274,23 @@ public class RegistroCursos extends javax.swing.JFrame {
                 }
                 CursoABuscarTxt.setVisible(true);
                 curso.setId(Integer.parseInt(CursoABuscarTxt.getText()));
-
                     labelCursoABuscar.setVisible(true);
+
                     idCursoSeleccionado.setText(String.valueOf(curso.getId()));
-                    CS.BuscarCurso(curso);
-                NombreTxt.setText(curso.getNombre_curso());
-                    NivelTxt.setText(curso.getNivel());
-                    CupoTxt.setText(String.valueOf(curso.getCupo_Maximo()));
+                    Cursos encontrado = CS.BuscarCurso(curso);
+                    if (encontrado !=null){
+                         NombreTxt.setText(encontrado.getNombre_curso());
+                         NivelTxt.setText(encontrado.getNivel());
+                         CupoTxt.setText(String.valueOf(encontrado.getCupo_Maximo()));
+                        JOptionPane.showMessageDialog(null, "curso encontrado correctamente");
 
             }
-        });
-
-
+                    else {
+                        JOptionPane.showMessageDialog(null, "curso NO encontrado");
+                    }
+        }
+        }
+        );
     }
     private void ListarCursos()  {
                         List<Cursos>ListaCursos= null;
