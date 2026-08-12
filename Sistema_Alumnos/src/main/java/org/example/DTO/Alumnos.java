@@ -12,7 +12,7 @@ public class Alumnos {
     public Alumnos(){
 
     }
-    public Alumnos(int Id, String Nombre, String Apellido, Date Fecha_Nacimiento, String Correo_electronico){
+    public Alumnos(int Id, String Nombre, String Apellido, Date Fecha_Nacimiento , String Correo_electronico){
         this.setNombre(Nombre);
         this.setApellido(Apellido);
         this.setFecha_Nacimiento(Fecha_Nacimiento);

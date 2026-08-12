@@ -37,7 +37,7 @@ public class AlumnoService {
         return alumnoDAO.ListarAlumnos();
     }
 
-    public Alumnos buscarPorId(int id) throws SQLException {
+    public Alumnos ObtenerAlumnosPorId(int id) throws SQLException {
 
         Alumnos alumno = alumnoDAO.ObtenerAlumnosPorId(id);
 

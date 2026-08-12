@@ -2,6 +2,8 @@
 package org.example.Repositories;
 import org.example.Connections.Connections;
 import org.example.DTO.Alumnos;
+import org.example.DTO.Cursos;
+
 import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
