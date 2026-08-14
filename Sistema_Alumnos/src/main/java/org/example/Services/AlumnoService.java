@@ -11,7 +11,7 @@ public class AlumnoService {
 
     private final AlumnoDAO alumnoDAO = new AlumnoDAO();
 
-    public void registrarAlumno(Alumnos alumno) {
+    public boolean registrarAlumno(Alumnos alumno) {
 
         validarAlumno(alumno);
 
@@ -20,6 +20,7 @@ public class AlumnoService {
         }
 
         alumnoDAO.insertarAlumnos(alumno);
+        return false;
     }
 
     public void editarCorreo(int idAlumno, String nuevoCorreo) {
@@ -96,7 +97,7 @@ public class AlumnoService {
     }
 
     private void validarFechas(Date nacimiento) {
-        if (nacimiento!=null){
+        if (nacimiento==null){
             System.out.println("La fecha de nacimiento es obligatoria");
         }
 

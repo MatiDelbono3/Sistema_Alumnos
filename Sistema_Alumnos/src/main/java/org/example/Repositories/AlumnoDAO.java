@@ -1,4 +1,3 @@
-
 package org.example.Repositories;
 import org.example.Connections.Connections;
 import org.example.DTO.Alumnos;
@@ -13,7 +12,7 @@ public class AlumnoDAO {
     private final Connections cn=new Connections();
 
     public int insertarAlumnos(Alumnos alumno){
-        String Sql="insert into estudiantes (Nombre, Apellido, Fecha_Nacimiento, Correo_electronico, Fecha_Inscripcion) VALUES (?, ?, ?, ?, ?)";
+        String Sql="insert into estudiantes (Nombre, Apellido, Fecha_Nacimiento, Correo_electronico) VALUES (?, ?, ?, ?)";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ((Connection) conexion).prepareStatement(Sql)){
             ps.setString(1, alumno.getNombre());
@@ -24,7 +23,6 @@ public class AlumnoDAO {
             int n=ps.executeUpdate();
             System.out.println("Número de filas afectadas: " + n); // Depuración
             return n;
-
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "error al insertar el alumno");
         }
@@ -71,49 +69,57 @@ public class AlumnoDAO {
         return AlumnoPorId;
     }
     public boolean existeAlumno(int Id){
-        Alumnos AlumnoPorId=new Alumnos();
         String Sql="Select * from estudiantes WHERE Id= ? LIMIT 1 ";
         try (Connection conexion= cn.Connect();
-             PreparedStatement ps = ( conexion.prepareStatement(Sql));
-             ResultSet rs=ps.executeQuery()){
-            while (rs.next()){
-                ps.setInt(1, Id);
+             PreparedStatement ps = ( conexion.prepareStatement(Sql)))
+        {
+
+
+            ps.setInt(1, Id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
             }
-        } catch (SQLException exc){
-            JOptionPane.showMessageDialog(null, "Error al verificar alumno");
+
+        } catch (SQLException exc) {
+            JOptionPane.showMessageDialog(null, "Error al verificar correo: " + exc.getMessage());
+            return false;
         }
-        return true;
     }
     public boolean existeCorreo(String correo_electronico){
         String Sql="Select * from estudiantes WHERE Correo_electronico= ? LIMIT 1 ";
         try (Connection conexion= cn.Connect();
-             PreparedStatement ps = ( conexion.prepareStatement(Sql));
-             ResultSet rs=ps.executeQuery()){
-            while (rs.next()){
-              ps.setString(5,correo_electronico);
+             PreparedStatement ps = ( conexion.prepareStatement(Sql))){
+
+
+            ps.setString(1, correo_electronico.trim().toLowerCase());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
             }
-        } catch (SQLException exc){
-            JOptionPane.showMessageDialog(null, "Error al verificar correo");
+
+        } catch (SQLException exc) {
+            JOptionPane.showMessageDialog(null, "Error al verificar correo: " + exc.getMessage());
+            return false;
+        }
+    }
+    public boolean tieneCursosActivos(int idAlumno){
+        String Sql="SELECT 1\n" +
+                "FROM inscripciones i\n" +
+                "INNER JOIN cursos c\n" +
+                "    ON i.curso_id = c.id\n" +
+                "WHERE i.alumno_id = ?\n" +
+                "  AND c.estado = 'ACTIVO'\n" +
+                "LIMIT 1; ";
+        try (Connection conexion= cn.Connect();
+             PreparedStatement ps = ( conexion.prepareStatement(Sql))){
+            ps.setString(1, String.valueOf(idAlumno));
+            ResultSet rs=ps.executeQuery();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
         return true;
     }
-public boolean tieneCursosActivos(int idAlumno){
-    String Sql="SELECT 1\n" +
-            "FROM inscripciones i\n" +
-            "INNER JOIN cursos c\n" +
-            "    ON i.curso_id = c.id\n" +
-            "WHERE i.alumno_id = ?\n" +
-            "  AND c.estado = 'ACTIVO'\n" +
-            "LIMIT 1; ";
-    try (Connection conexion= cn.Connect();
-         PreparedStatement ps = ( conexion.prepareStatement(Sql))){
-        ps.setString(1, String.valueOf(idAlumno));
-        ResultSet rs=ps.executeQuery();
-    } catch (SQLException e) {
-        throw new RuntimeException(e);
-    }
-    return true;
-}
 
     public boolean editarCorreo(int idAlumno, String nuevoCorreo){
         String sql ="update estudiantes set Correo_electronico = ? where Id= ?";

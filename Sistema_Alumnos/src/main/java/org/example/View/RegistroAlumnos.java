@@ -28,7 +28,6 @@ public class RegistroAlumnos extends javax.swing.JFrame {
     private JTextField ApellidoTxt;
     private JTextField FechaNacimientoTxt;
     private JTextField CorreoTxt;
-    private JTextField FechaInscripcionTxt;
     private JTextField NuevoCorreoTxt;
     private JTextField AlumnoAEliminarTxt;
     private JTextField AlumnoABuscarTxt;
@@ -46,7 +45,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         setLayout(new BorderLayout());
         // Panel para registro de Alumnos
         JPanel PanelRegistroAlumnos=new JPanel();
-        PanelRegistroAlumnos.setLayout(new GridLayout(8,2,10,10)); // 4 filas, 2 columnas
+        PanelRegistroAlumnos.setLayout(new GridLayout(10,2,10,10)); // 4 filas, 2 columnas
         PanelRegistroAlumnos.setBackground(Color.LIGHT_GRAY);
 
         // labels
@@ -124,21 +123,31 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         //Agregar elementos al panel
         PanelRegistroAlumnos.add(labelNombre);
         PanelRegistroAlumnos.add(NombreTxt);
+
         PanelRegistroAlumnos.add(labelApellido);
         PanelRegistroAlumnos.add(ApellidoTxt);
+
         PanelRegistroAlumnos.add(labelNacimiento);
         PanelRegistroAlumnos.add(FechaNacimientoTxt);
+
         PanelRegistroAlumnos.add(labelCorreo);
         PanelRegistroAlumnos.add(CorreoTxt);
+
+        PanelRegistroAlumnos.add(botonEdicionAlumnos);
         PanelRegistroAlumnos.add(labelIdAlumno);
-        PanelRegistroAlumnos.add(IdAlumnoseleccionado);
+
+        PanelRegistroAlumnos.add(new JLabel(""));
+        PanelRegistroAlumnos.add(IdTxt);
         PanelRegistroAlumnos.add(labelNuevocorreo);
         PanelRegistroAlumnos.add(NuevoCorreoTxt);
-        PanelRegistroAlumnos.add(botonRegistroAlumnos);
-        PanelRegistroAlumnos.add(botonEdicionAlumnos);
-        PanelRegistroAlumnos.add(AlumnoAEliminarTxt);
+
         PanelRegistroAlumnos.add(botonEliminacionAlumnos);
-        PanelRegistroAlumnos.add(AlumnoABuscarTxt);
+        PanelRegistroAlumnos.add(new JLabel("ID del alumno"));
+
+        PanelRegistroAlumnos.add(new JLabel(""));
+        PanelRegistroAlumnos.add(AlumnoAEliminarTxt);
+
+        PanelRegistroAlumnos.add(botonRegistroAlumnos);
         PanelRegistroAlumnos.add(botonBusquedaAlumnos);
 
         // Panel para la tabla
@@ -194,8 +203,12 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                 alumno.setApellido(ApellidoTxt.getText());
                 alumno.setFecha_Nacimiento(sqlFechaNacimiento);
                 alumno.setCorreo_electronico(CorreoTxt.getText());
-                AS.registrarAlumno(alumno);
+                if (AS.registrarAlumno(alumno)){
                 JOptionPane.showMessageDialog(null, "Alumno registrado con éxito");
+                }
+                else {
+                    JOptionPane.showMessageDialog(null, "No se pudo registrar el alumno, intente nuevamente");
+                }
                 ListarAlumnos();
                 limpiarDatosAlumno();
             }
@@ -244,11 +257,10 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                 }
                 if (!nuevoCorreo.equalsIgnoreCase("")){
                     AS.editarCorreo( idSeleccionado, nuevoCorreo);
+                }
                 JOptionPane.showMessageDialog(null, "modificacion realizada con exito");
                 ListarAlumnos();
                 limpiarDatosAlumno();
-            }
-
             }
         });
         botonEliminacionAlumnos.addActionListener(new ActionListener() {
@@ -342,13 +354,13 @@ public class RegistroAlumnos extends javax.swing.JFrame {
             ApellidoTxt.setText("");
             FechaNacimientoTxt.setText("");
             CorreoTxt.setText("");
-            FechaInscripcionTxt.setText("");
+
 
             NombreTxt.setEnabled(true);
             ApellidoTxt.setEnabled(true);
             FechaNacimientoTxt.setEnabled(true);
             CorreoTxt.setEnabled(true);
-            FechaInscripcionTxt.setEnabled(true);
+
         }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() ->
