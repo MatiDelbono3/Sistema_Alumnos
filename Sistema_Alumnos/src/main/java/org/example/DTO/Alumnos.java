@@ -13,6 +13,7 @@ public class Alumnos {
 
     }
     public Alumnos(int Id, String Nombre, String Apellido, Date Fecha_Nacimiento , String Correo_electronico){
+        this.setId(Id);
         this.setNombre(Nombre);
         this.setApellido(Apellido);
         this.setFecha_Nacimiento(Fecha_Nacimiento);

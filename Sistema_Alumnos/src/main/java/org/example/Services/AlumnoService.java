@@ -23,7 +23,7 @@ public class AlumnoService {
         return false;
     }
 
-    public void editarCorreo(int idAlumno, String nuevoCorreo) {
+    public boolean editarCorreo(int idAlumno, String nuevoCorreo) {
 
         validarCorreo(nuevoCorreo);
 
@@ -31,7 +31,8 @@ public class AlumnoService {
             throw new IllegalArgumentException("El alumno no existe.");
         }
 
-        alumnoDAO.editarCorreo(idAlumno, nuevoCorreo);
+        alumnoDAO.editarCorreo(nuevoCorreo, idAlumno);
+        return false;
     }
 
     public List<Alumnos> listarAlumnos() throws SQLException {

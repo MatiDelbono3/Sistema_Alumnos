@@ -238,7 +238,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                 ApellidoTxt.setEnabled(false);
                 FechaNacimientoTxt.setEnabled(false);
                 CorreoTxt.setEnabled(false);
-                labelIdAlumno.setVisible(true);
+                labelIdAlumno.setVisible(false);
                 IdAlumnoseleccionado.setVisible(true);
                 int fila=TablaAlumnos.getSelectedRow();
                 if (fila == -1){
@@ -246,19 +246,23 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                     return;
                 }
                 String nuevoCorreo= NuevoCorreoTxt.getText();
-                int idSeleccionado=Integer.parseInt(IdAlumnoseleccionado.getText());
+
                 try{
                     if (nuevoCorreo.isEmpty()){
-                        JOptionPane.showMessageDialog(null, "Error al obtener el ID del alumno");
-
+                        JOptionPane.showMessageDialog(null, "Ingrese el nuevo correo");
+                        return;
                     }
                 } catch (HeadlessException ex) {
                     throw new RuntimeException(ex);
                 }
-                if (!nuevoCorreo.equalsIgnoreCase("")){
-                    AS.editarCorreo( idSeleccionado, nuevoCorreo);
+                int idSeleccionado=Integer.parseInt(IdAlumnoseleccionado.getText());
+                boolean exito=AS.editarCorreo(idSeleccionado, nuevoCorreo);
+                if (exito) {
+                    JOptionPane.showMessageDialog(null, "modificacion realizada con exito");
                 }
-                JOptionPane.showMessageDialog(null, "modificacion realizada con exito");
+                else{
+                    JOptionPane.showMessageDialog(null, "Error al realizar modificacion");
+                }
                 ListarAlumnos();
                 limpiarDatosAlumno();
             }

@@ -82,7 +82,7 @@ public class AlumnoDAO {
             }
 
         } catch (SQLException exc) {
-            JOptionPane.showMessageDialog(null, "Error al verificar correo: " + exc.getMessage());
+            JOptionPane.showMessageDialog(null, "Error al verificar alumno: " + exc.getMessage());
             return false;
         }
     }
@@ -121,21 +121,23 @@ public class AlumnoDAO {
         return true;
     }
 
-    public boolean editarCorreo(int idAlumno, String nuevoCorreo){
+    public boolean editarCorreo(String nuevoCorreo, int idAlumno){
         String sql ="update estudiantes set Correo_electronico = ? where Id= ?";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = (conexion.prepareStatement(sql))){
-            ps.setString(5, nuevoCorreo);
+            ps.setString(1, nuevoCorreo);
+            ps.setInt(2, idAlumno);
+            System.out.println("Intentando actualizar ID: " + idAlumno + " con Correo: " + nuevoCorreo);
             int filasAfectadas=ps.executeUpdate();
             if (filasAfectadas > 0){
-                JOptionPane.showMessageDialog(null, "modificación realizada con exito");
+                System.out.println("modificacion realizada con exito");
                 return true;
             }
             else {
-                JOptionPane.showMessageDialog(null, "error al realizar la modificación");
+               System.out.println("Error al realizar la modificacion");
             }
         } catch (SQLException exception){
-            JOptionPane.showMessageDialog(null, "error al realizar la modificación");
+            System.err.println("Error SQL en editarCorreo:" + exception.getMessage());
         }
         return false;
     }
