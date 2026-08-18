@@ -14,7 +14,7 @@ public class InscripcionDAO {
     private final Connections cn=new Connections();
 
     public void insertarInscripciones(Inscripciones inscripcion){
-        String Sql="insert into inscripciones (idCurso, idEstudiante, fechaInscripcion, estado) VALUES (?, ?, ?, ?, ?)";
+        String Sql="insert into inscripciones ( estudiante_id, curso_id, fecha_inscripcion, estado) VALUES (?, ?, ?, ?, ?)";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ((Connection) conexion).prepareStatement(Sql)){
             ps.setInt(1, inscripcion.getId_Alumno());
@@ -84,7 +84,7 @@ public int ContarAlumnosInscriptos(int idCurso){
         }
     }
     public boolean estaInscripto(int idAlumno, int idCurso){
-        String Sql="Select * from inscripciones WHERE alumno_id= ? AND curso_id = ? LIMIT 1 ";
+        String Sql="Select * from inscripciones WHERE estudiante_id= ? AND curso_id = ? LIMIT 1 ";
         try (Connection conexion = cn.Connect();
              PreparedStatement ps = conexion.prepareStatement(Sql)) {
 
@@ -127,10 +127,10 @@ public int ContarAlumnosInscriptos(int idCurso){
     }
     public List<Alumnos> buscarAlumnosPorCurso(int idCurso) throws SQLException {
         List<Alumnos>alumnosPorCurso=new ArrayList<>();
-        String Sql=" SELECT a.*\n" +
-                "        FROM alumnos a\n" +
+        String Sql=" SELECT e.*\n" +
+                "        FROM estudiantes e\n" +
                 "        INNER JOIN inscripciones i\n" +
-                "            ON a.id = i.alumno_id\n" +
+                "            ON e.id = i.estudiante_id\n" +
                 "        WHERE i.curso_id = ? ";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ( conexion.prepareStatement(Sql))){
@@ -155,9 +155,9 @@ public int ContarAlumnosInscriptos(int idCurso){
         List<Inscripciones>inscripcionesPorAlumno=new ArrayList<>();
         String Sql=" SELECT i.*\n" +
                 "        FROM inscripciones i\n" +
-                "        INNER JOIN alumnos a\n" +
-                "            ON a.id = i.alumno_id\n" +
-                "        WHERE i.alumno_id = ? ";
+                "        INNER JOIN estudiantes e\n" +
+                "            ON e.id = i.estudiante_id\n" +
+                "        WHERE i.estudiante_id = ? ";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ( conexion.prepareStatement(Sql))){
             ps.setInt(1, idAlumno);
@@ -165,7 +165,7 @@ public int ContarAlumnosInscriptos(int idCurso){
             while (rs.next()){
                 Inscripciones inscripcion =new Inscripciones();
                 inscripcion.setId(rs.getInt(rs.getInt("id")));
-                inscripcion.setId_Alumno(rs.getString("alumno_id"));
+                inscripcion.setId_Alumno(rs.getString("estudiante_id"));
                 inscripcion.setId_Curso(rs.getString("curso_id"));
                 inscripcion.setFechaInscripcion(rs.getDate("fecha_inscripcion").toLocalDate());
                 inscripcion.setEstado(rs.getString("estado"));
@@ -182,8 +182,8 @@ public int ContarAlumnosInscriptos(int idCurso){
         String Sql=" SELECT i.*\n" +
                 "        FROM inscripciones i\n" +
                 "        INNER JOIN cursos c\n" +
-                "            ON c.id = i.alumno_id\n" +
-                "        WHERE i.alumno_id = ? ";
+                "            ON c.id = i.curso_id\n" +
+                "        WHERE i.curso_id = ? ";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ( conexion.prepareStatement(Sql))){
             ps.setInt(1, idCurso);
@@ -191,7 +191,7 @@ public int ContarAlumnosInscriptos(int idCurso){
             while (rs.next()){
                 Inscripciones inscripcion =new Inscripciones();
                 inscripcion.setId(rs.getInt(rs.getInt("id")));
-                inscripcion.setId_Alumno(rs.getString("alumno_id"));
+                inscripcion.setId_Alumno(rs.getString("estudiante_id"));
                 inscripcion.setId_Curso(rs.getString("curso_id"));
                 inscripcion.setFechaInscripcion(rs.getDate("fecha_inscripcion").toLocalDate());
                 inscripcion.setEstado(rs.getString("estado"));
@@ -209,7 +209,7 @@ public int ContarAlumnosInscriptos(int idCurso){
                 "        FROM cursos a\n" +
                 "        INNER JOIN inscripciones i\n" +
                 "            ON c.id = i.curso_id\n" +
-                "        WHERE i.alumno_id = ? ";
+                "        WHERE i.estudiante_id = ? ";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ( conexion.prepareStatement(Sql))){
             ps.setInt(1, idAlumno);
@@ -243,7 +243,7 @@ public int ContarAlumnosInscriptos(int idCurso){
         String Sql3="SELECT 1\n" +
                 "FROM inscripciones i\n" +
                 "JOIN cursos c ON i.curso_id = c.id\n" +
-                "WHERE i.alumno_id = ?\n" +
+                "WHERE i.estudiante_id = ?\n" +
                 "  AND c.nivel = '?'\n" +
                 "  AND i.estado = 'APROBADO'\n" +
                 "LIMIT 1; ";
@@ -260,7 +260,7 @@ public int ContarAlumnosInscriptos(int idCurso){
 
 
     public boolean editarEstado(Inscripciones inscripcion){
-        String sql ="update inscripciones set estado = ? where Id= ?";
+        String sql ="update inscripciones set estado = INACTIVO where Id= ?";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = (conexion.prepareStatement(sql))){
             ps.setString(4, String.valueOf(inscripcion));

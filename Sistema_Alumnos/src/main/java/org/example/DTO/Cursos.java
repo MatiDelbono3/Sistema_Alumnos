@@ -1,10 +1,13 @@
 package org.example.DTO;
 
+import java.util.Date;
+
 public class Cursos {
     private int id;
     private String nombre_curso;
     private String nivel;
     private int Cupo_Maximo;
+
 
     public Cursos(){
 
@@ -14,6 +17,7 @@ public class Cursos {
         this.setNombre_curso(nombre_curso);
         this.setNivel(nivel);
         this.setCupo_Maximo(Cupo_Maximo);
+
     }
 
 

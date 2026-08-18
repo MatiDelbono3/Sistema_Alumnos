@@ -29,8 +29,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
     private JTextField FechaNacimientoTxt;
     private JTextField CorreoTxt;
     private JTextField NuevoCorreoTxt;
-    private JTextField AlumnoAEliminarTxt;
-    private JTextField AlumnoABuscarTxt;
+    private JTextField AlumnoTxt;
     private JTable TablaAlumnos;
 
     public RegistroAlumnos(){
@@ -62,14 +61,18 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         labelCorreo.setFont(new Font("Arial", Font.BOLD, 14));
 
         JLabel labelIdAlumno=new JLabel("ID del alumno");
-        JLabel IdAlumnoseleccionado=new JLabel("");
+        JLabel IdAlumnoaeditar=new JLabel("");
+
 
         JLabel labelNuevocorreo=new JLabel("Nuevo Correo electrónico");
         labelNuevocorreo.setFont(new Font("Arial", Font.BOLD, 14));
 
-        JLabel labelAlumnoAEliminar=new JLabel("Alumno a eliminar");
-        labelAlumnoAEliminar.setFont(new Font("Arial", Font.BOLD, 14));
 
+
+        JLabel labelAlumnoAEliminar=new JLabel("Alumno a eliminar");
+
+        labelAlumnoAEliminar.setFont(new Font("Arial", Font.BOLD, 14));
+        JLabel IdAlumnoaeliminar=new JLabel("");
         JLabel labelAlumnoABuscar=new JLabel("Alumno a buscar");
         labelAlumnoABuscar.setFont(new Font("Arial", Font.BOLD, 14));
 
@@ -113,8 +116,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         FechaNacimientoTxt=new JTextField(10);
         CorreoTxt=new JTextField(10);
         NuevoCorreoTxt=new JTextField(10);
-        AlumnoAEliminarTxt = new JTextField(10);
-        AlumnoABuscarTxt=new JTextField(10);
+        AlumnoTxt=new JTextField(10);
         labelNuevocorreo.setVisible(false);
         NuevoCorreoTxt.setVisible(false);
 
@@ -133,23 +135,18 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         PanelRegistroAlumnos.add(labelCorreo);
         PanelRegistroAlumnos.add(CorreoTxt);
 
-        PanelRegistroAlumnos.add(botonEdicionAlumnos);
-        PanelRegistroAlumnos.add(labelIdAlumno);
 
-        PanelRegistroAlumnos.add(new JLabel(""));
-        PanelRegistroAlumnos.add(IdTxt);
+        PanelRegistroAlumnos.add(labelIdAlumno); // "ID del alumno" (Edición)
+        PanelRegistroAlumnos.add(AlumnoTxt); // Campo de texto para ID de Edición
         PanelRegistroAlumnos.add(labelNuevocorreo);
         PanelRegistroAlumnos.add(NuevoCorreoTxt);
 
         PanelRegistroAlumnos.add(botonEliminacionAlumnos);
-        PanelRegistroAlumnos.add(new JLabel("ID del alumno"));
 
-        PanelRegistroAlumnos.add(new JLabel(""));
-        PanelRegistroAlumnos.add(AlumnoAEliminarTxt);
 
+        PanelRegistroAlumnos.add(botonEdicionAlumnos);
         PanelRegistroAlumnos.add(botonRegistroAlumnos);
         PanelRegistroAlumnos.add(botonBusquedaAlumnos);
-
         // Panel para la tabla
         JPanel PanelTablaAlumnos = new JPanel(new BorderLayout());
         PanelTablaAlumnos.setBorder(BorderFactory.createTitledBorder("Lista de Alumnos"));
@@ -169,7 +166,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         FechaNacimientoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         CorreoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         NuevoCorreoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        AlumnoAEliminarTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        AlumnoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         // Lógica de los botones
         botonRegistroAlumnos.addActionListener(new ActionListener() {
             @Override
@@ -218,9 +215,9 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                 int FilaSeleccionada=TablaAlumnos.getSelectedRow();
                 if (FilaSeleccionada != -1){
                     int IdAlumnoSeleccionado= (int) TablaAlumnos.getValueAt(FilaSeleccionada, 0);
-                    IdAlumnoseleccionado.setText(String.valueOf(IdAlumnoSeleccionado));
-                    AlumnoAEliminarTxt.setText(String.valueOf(IdAlumnoSeleccionado));
+                    AlumnoTxt.setText(String.valueOf(IdAlumnoSeleccionado));
                     if (IdAlumnoSeleccionado > 0){
+                        IdAlumnoaeditar.setVisible(true);
                         labelIdAlumno.setVisible(true);
                         labelNuevocorreo.setVisible(true);
                         NuevoCorreoTxt.setVisible(true);
@@ -238,8 +235,8 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                 ApellidoTxt.setEnabled(false);
                 FechaNacimientoTxt.setEnabled(false);
                 CorreoTxt.setEnabled(false);
-                labelIdAlumno.setVisible(false);
-                IdAlumnoseleccionado.setVisible(true);
+                labelIdAlumno.setVisible(true);
+                IdAlumnoaeditar.setVisible(true);
                 int fila=TablaAlumnos.getSelectedRow();
                 if (fila == -1){
                     JOptionPane.showMessageDialog(null, "seleccione un alumno");
@@ -255,8 +252,9 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                 } catch (HeadlessException ex) {
                     throw new RuntimeException(ex);
                 }
-                int idSeleccionado=Integer.parseInt(IdAlumnoseleccionado.getText());
-                boolean exito=AS.editarCorreo(idSeleccionado, nuevoCorreo);
+                int idSeleccionado=Integer.parseInt(AlumnoTxt.getText());
+                boolean exito=AS.editarCorreo(nuevoCorreo, idSeleccionado);
+                System.out.println("Valor exacto de exito en la View: " + exito);
                 if (exito) {
                     JOptionPane.showMessageDialog(null, "modificacion realizada con exito");
                 }
@@ -275,24 +273,32 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                 FechaNacimientoTxt.setEnabled(false);
                 CorreoTxt.setEnabled(false);
                 labelIdAlumno.setVisible(true);
-                IdAlumnoseleccionado.setVisible(true);
+                IdAlumnoaeliminar.setVisible(true);
                 int fila=TablaAlumnos.getSelectedRow();
                 if (fila == -1){
                     JOptionPane.showMessageDialog(null, "seleccione un alumno");
                     return;
                 }
-                int idSeleccionado=Integer.parseInt(IdAlumnoseleccionado.getText());
-                try{
-                    if (!(idSeleccionado>0 )){
-                        JOptionPane.showMessageDialog(null, "Error al obtener el ID del alumno");
+                String idTexto = AlumnoTxt.getText().trim();
 
-                    }
-                } catch (HeadlessException ex) {
-                    throw new RuntimeException(ex);
+                // 3. Validamos que no esté vacío antes del parseInt
+                if (idTexto.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "No se pudo obtener el ID del alumno");
+                    return;
                 }
 
-               AS.eliminarAlumno(idSeleccionado);
-                JOptionPane.showMessageDialog(null, "alumno eliminado con exito");
+
+                int idSeleccionado = Integer.parseInt(idTexto);
+                try {
+                    if (AS.eliminarAlumno(idSeleccionado)){
+                         JOptionPane.showMessageDialog(null, "alumno eliminado con exito");
+                     }
+                     else{
+                         JOptionPane.showMessageDialog(null, "error al eliminar el alumno");
+                     }
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
                 ListarAlumnos();
                 limpiarDatosAlumno();
 
@@ -302,16 +308,16 @@ public class RegistroAlumnos extends javax.swing.JFrame {
      botonBusquedaAlumnos.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (AlumnoABuscarTxt.getText().isEmpty()){
+            if (AlumnoTxt.getText().isEmpty()){
                 JOptionPane.showMessageDialog(null, "Error al obtener el ID del alumno");
                 return;
             }
-            AlumnoABuscarTxt.setVisible(true);
-            int id=Integer.parseInt(AlumnoABuscarTxt.getText());
+            AlumnoTxt.setVisible(true);
+            int id=Integer.parseInt(AlumnoTxt.getText());
             alumno.setId(id);
             labelAlumnoABuscar.setVisible(true);
 
-            IdAlumnoseleccionado.setText(String.valueOf(alumno.getId()));
+            AlumnoTxt.setText(String.valueOf(alumno.getId()));
             Alumnos Alumnoencontrado = null;
             try {
                 Alumnoencontrado = AS.ObtenerAlumnosPorId(id);

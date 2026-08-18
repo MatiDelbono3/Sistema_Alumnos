@@ -23,7 +23,7 @@ public class AlumnoService {
         return false;
     }
 
-    public boolean editarCorreo(int idAlumno, String nuevoCorreo) {
+    public boolean editarCorreo(String nuevoCorreo, int idAlumno) {
 
         validarCorreo(nuevoCorreo);
 
@@ -32,7 +32,7 @@ public class AlumnoService {
         }
 
         alumnoDAO.editarCorreo(nuevoCorreo, idAlumno);
-        return false;
+        return true;
     }
 
     public List<Alumnos> listarAlumnos() throws SQLException {
@@ -51,18 +51,13 @@ public class AlumnoService {
     }
 
 
-    public void eliminarAlumno(int idAlumno) {
+    public boolean eliminarAlumno(int idAlumno) throws SQLException {
 
         if (!alumnoDAO.existeAlumno(idAlumno)) {
             throw new IllegalArgumentException("El alumno no existe.");
         }
-
-        if (alumnoDAO.tieneCursosActivos(idAlumno)) {
-            throw new IllegalArgumentException(
-                    "No puede eliminarse un alumno con cursos activos.");
-        }
-
         alumnoDAO.eliminarAlumno(idAlumno);
+        return true;
     }
 
     private void validarAlumno(Alumnos alumno) {

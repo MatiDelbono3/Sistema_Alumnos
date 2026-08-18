@@ -2,6 +2,7 @@ package org.example.Repositories;
 import org.example.Connections.Connections;
 import org.example.DTO.Alumnos;
 import org.example.DTO.Cursos;
+import org.example.DTO.Inscripciones;
 
 import javax.swing.*;
 import java.sql.*;
@@ -10,7 +11,8 @@ import java.util.List;
 
 public class AlumnoDAO {
     private final Connections cn=new Connections();
-
+    InscripcionDAO inscripcionDAO=new InscripcionDAO();
+    Inscripciones inscripcion=new Inscripciones();
     public int insertarAlumnos(Alumnos alumno){
         String Sql="insert into estudiantes (Nombre, Apellido, Fecha_Nacimiento, Correo_electronico) VALUES (?, ?, ?, ?)";
         try (Connection conexion= cn.Connect();
@@ -19,9 +21,8 @@ public class AlumnoDAO {
             ps.setString(2, alumno.getApellido());
             ps.setDate(3, (Date) alumno.getFecha_Nacimiento());
             ps.setString(4, alumno.getCorreo_electronico());
-
             int n=ps.executeUpdate();
-            System.out.println("Número de filas afectadas: " + n); // Depuración
+            System.out.println("Número de filas afectadas: " + n);
             return n;
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "error al insertar el alumno");
@@ -51,22 +52,24 @@ public class AlumnoDAO {
     }
     public Alumnos ObtenerAlumnosPorId(int id) throws SQLException {
         Alumnos AlumnoPorId=new Alumnos();
-        String Sql="Select * from estudiantes WHERE Id= ? ";
+        String Sql="Select Id, Nombre, Apellido, Fecha_Nacimiento, Correo_electronico from estudiantes WHERE Id= ? ";
         try (Connection conexion= cn.Connect();
-             PreparedStatement ps = ( conexion.prepareStatement(Sql));
-             ResultSet rs=ps.executeQuery()){
-            while (rs.next()){
+             PreparedStatement ps = ( conexion.prepareStatement(Sql))){
+             ps.setInt(1, id);
+             ResultSet rs=ps.executeQuery();
+            if (rs.next()){
                 AlumnoPorId.setId(rs.getInt(1));
                 AlumnoPorId.setNombre(rs.getString(2));
                 AlumnoPorId.setApellido(rs.getString(3));
                 AlumnoPorId.setFecha_Nacimiento(rs.getDate(4));
                 AlumnoPorId.setCorreo_electronico(rs.getString(5));
-
+                return AlumnoPorId;
             }
         } catch (SQLException exc){
-            JOptionPane.showMessageDialog(null, "Error al listar alumnos");
+            JOptionPane.showMessageDialog(null, "Error al obtener alumno");
+
         }
-        return AlumnoPorId;
+        return null;
     }
     public boolean existeAlumno(int Id){
         String Sql="Select * from estudiantes WHERE Id= ? LIMIT 1 ";
@@ -108,8 +111,8 @@ public class AlumnoDAO {
                 "FROM inscripciones i\n" +
                 "INNER JOIN cursos c\n" +
                 "    ON i.curso_id = c.id\n" +
-                "WHERE i.alumno_id = ?\n" +
-                "  AND c.estado = 'ACTIVO'\n" +
+                "WHERE i.estudiante_id = ?\n" +
+                "  AND i.estado = 'ACTIVO'\n" +
                 "LIMIT 1; ";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ( conexion.prepareStatement(Sql))){
@@ -141,13 +144,20 @@ public class AlumnoDAO {
         }
         return false;
     }
-    public boolean eliminarAlumno(int id){
-        String sql="delete from estudiantes where Id=?";
-        try (Connection conexion =cn.Connect();
-             PreparedStatement ps = (conexion.prepareStatement(sql))){
-            ps.setInt( 1, id);
 
-            int filasAfectadas= ps.executeUpdate();
+    public boolean eliminarAlumno(int id) throws SQLException {
+
+       String sqlInsc="delete from inscripciones where estudiante_id=?";
+        String sqlAlu="delete from estudiantes where Id=?";
+        try (Connection conexion =cn.Connect()){
+            PreparedStatement psI=(conexion.prepareStatement(sqlInsc));
+            psI.setInt(1, id);
+            psI.executeUpdate();
+
+            PreparedStatement psA=(conexion.prepareStatement(sqlAlu));
+            psA.setInt(1, id);
+            int filasAfectadas= psA.executeUpdate();
+
             if (filasAfectadas > 0 ){
                 System.out.println("Alumno eliminado con éxito");
                 return true;
