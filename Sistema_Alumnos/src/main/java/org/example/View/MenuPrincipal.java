@@ -66,11 +66,15 @@ public class MenuPrincipal extends javax.swing.JFrame {
         botonInscripciones.setBorderPainted(false);
         botonInscripciones.setPreferredSize(new Dimension(150,35));
 
-
-
-
-
         JButton botonProfesores=new JButton("Docentes");
+        botonProfesores.setFont(new Font("Arial",Font.BOLD, 14));
+        botonProfesores.setBackground(new Color(51, 153, 255));
+        botonProfesores.setForeground(Color.WHITE);
+        botonProfesores.setFocusPainted(false);
+        botonProfesores.setBorderPainted(false);
+        botonProfesores.setPreferredSize(new Dimension(120,35));
+
+        JButton botonAsistencias=new JButton("Asistencias");
         botonProfesores.setFont(new Font("Arial",Font.BOLD, 14));
         botonProfesores.setBackground(new Color(51, 153, 255));
         botonProfesores.setForeground(Color.WHITE);
@@ -115,6 +119,30 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 RegistroAlumnos Alu = null;
                 Alu=new RegistroAlumnos();
                 Alu.setVisible(true);
+            }
+        });
+        botonInscripciones.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RegistroInscripciones Insc = null;
+                Insc=new RegistroInscripciones();
+                Insc.setVisible(true);
+            }
+        });
+        botonInscripciones.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RegistroInscripciones Insc = null;
+                Insc=new RegistroInscripciones();
+                Insc.setVisible(true);
+            }
+        });
+        botonProfesores.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RegistroInscripciones Insc = null;
+                Insc=new RegistroInscripciones();
+                Insc.setVisible(true);
             }
         });
 
