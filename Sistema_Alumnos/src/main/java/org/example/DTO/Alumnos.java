@@ -3,7 +3,7 @@ package org.example.DTO;
 import java.util.Date;
 
 public class Alumnos {
-    private int Id;
+    private String Id;
     private String Nombre;
     private String Apellido;
     private Date Fecha_Nacimiento;
@@ -12,7 +12,7 @@ public class Alumnos {
     public Alumnos(){
 
     }
-    public Alumnos(int Id, String Nombre, String Apellido, Date Fecha_Nacimiento , String Correo_electronico){
+    public Alumnos(String Id, String Nombre, String Apellido, Date Fecha_Nacimiento , String Correo_electronico){
         this.setId(Id);
         this.setNombre(Nombre);
         this.setApellido(Apellido);
@@ -20,11 +20,11 @@ public class Alumnos {
         this.setCorreo_electronico(Correo_electronico);
     }
 
-    public int getId() {
+    public String getId() {
         return Id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         Id = id;
     }
 

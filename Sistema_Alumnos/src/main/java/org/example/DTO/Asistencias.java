@@ -1,34 +1,35 @@
 package org.example.DTO;
+import java.sql.Date;
 import java.time.LocalDate;
-import java.util.Date;
+
 public class Asistencias {
-    private int Id;
-    private int idAlumno;
-    private int idCurso;
+    private String Id;
+    private String idAlumno;
+    private String idCurso;
     private LocalDate fecha;
     private String estado;
 
-    public int getId() {
+    public String getId() {
         return Id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         Id = id;
     }
 
-    public int getIdAlumno() {
+    public String getIdAlumno() {
         return idAlumno;
     }
 
-    public void setIdAlumno(int idAlumno) {
+    public void setIdAlumno(String idAlumno) {
         this.idAlumno = idAlumno;
     }
 
-    public int getIdCurso() {
+    public String getIdCurso() {
         return idCurso;
     }
 
-    public void setIdCurso(int idCurso) {
+    public void setIdCurso(String idCurso) {
         this.idCurso = idCurso;
     }
 
@@ -36,8 +37,8 @@ public class Asistencias {
         return fecha;
     }
 
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
+    public void setFecha(Date fecha) {
+        this.fecha = fecha.toLocalDate();
     }
 
     public String getEstado() {

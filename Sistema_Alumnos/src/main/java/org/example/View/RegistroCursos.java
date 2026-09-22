@@ -195,21 +195,21 @@ public class RegistroCursos extends javax.swing.JFrame {
         TablaCursos.getSelectionModel().addListSelectionListener(e ->{
             if (!e.getValueIsAdjusting()) {
                 int FilaSeleccionada=TablaCursos.getSelectedRow();
-            if (FilaSeleccionada != -1 ){
-                int IdCursoSeleccionado= (int) TablaCursos.getValueAt(FilaSeleccionada, 0);
-                idCursoSeleccionado.setText(String.valueOf(IdCursoSeleccionado));
-                CursoAEliminarTxt.setText(String.valueOf(IdCursoSeleccionado));
-                if (IdCursoSeleccionado > 0) {
-                    curso.setId(IdCursoSeleccionado);
-                    idCursoSeleccionado.setVisible(true);
-                    labelIdCurso.setVisible(true);
-                    labelnuevoCupo.setVisible(true);
-                    NuevoCupoTxt.setVisible(true);
+                if (FilaSeleccionada != -1 ){
+                    int IdCursoSeleccionado= (int) TablaCursos.getValueAt(FilaSeleccionada, 0);
+                    idCursoSeleccionado.setText(String.valueOf(IdCursoSeleccionado));
+                    CursoAEliminarTxt.setText(String.valueOf(IdCursoSeleccionado));
+                    if (IdCursoSeleccionado > 0) {
+                        curso.setId(String.valueOf(IdCursoSeleccionado));
+                        idCursoSeleccionado.setVisible(true);
+                        labelIdCurso.setVisible(true);
+                        labelnuevoCupo.setVisible(true);
+                        NuevoCupoTxt.setVisible(true);
 
-                } else {
-                    JOptionPane.showMessageDialog(null, "Error al obtener el ID del curso");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Error al obtener el ID del curso");
+                    }
                 }
-            }
             }
         });
         botonModificarCurso.addActionListener(new ActionListener() {
@@ -245,7 +245,7 @@ public class RegistroCursos extends javax.swing.JFrame {
                 limpiarDatosCurso();
 
                 labelIdCurso.setVisible(false);
-                    idCursoSeleccionado.setVisible(false);
+                idCursoSeleccionado.setVisible(false);
 
             }
         });
@@ -256,51 +256,51 @@ public class RegistroCursos extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "Error al obtener el ID del curso");
                     return;
                 }
-                curso.setId(Integer.parseInt(CursoAEliminarTxt.getText()));
-                    CS.eliminarCurso(curso);
-                    JOptionPane.showMessageDialog(null, "curso eliminado con éxito");
-                    labelIdCurso.setVisible(false);
-                    idCursoSeleccionado.setVisible(false);
-                    ListarCursos();
-                }
+                curso.setId((CursoAEliminarTxt.getText()));
+                CS.eliminarCurso(curso);
+                JOptionPane.showMessageDialog(null, "curso eliminado con éxito");
+                labelIdCurso.setVisible(false);
+                idCursoSeleccionado.setVisible(false);
+                ListarCursos();
+            }
 
         });
         botonBuscarCurso.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (CursoABuscarTxt.getText().isEmpty()){
-                    JOptionPane.showMessageDialog(null, "Error al obtener el ID del curso");
-                    return;
-                }
-                CursoABuscarTxt.setVisible(true);
-                curso.setId(Integer.parseInt(CursoABuscarTxt.getText()));
-                    labelCursoABuscar.setVisible(true);
+                                               @Override
+                                               public void actionPerformed(ActionEvent e) {
+                                                   if (CursoABuscarTxt.getText().isEmpty()){
+                                                       JOptionPane.showMessageDialog(null, "Error al obtener el ID del curso");
+                                                       return;
+                                                   }
+                                                   CursoABuscarTxt.setVisible(true);
+                                                   curso.setId((CursoABuscarTxt.getText()));
+                                                   labelCursoABuscar.setVisible(true);
 
-                    idCursoSeleccionado.setText(String.valueOf(curso.getId()));
-                    Cursos encontrado = CS.BuscarCurso(curso);
-                    if (encontrado !=null){
-                         NombreTxt.setText(encontrado.getNombre_curso());
-                         NivelTxt.setText(encontrado.getNivel());
-                         CupoTxt.setText(String.valueOf(encontrado.getCupo_Maximo()));
-                        JOptionPane.showMessageDialog(null, "curso encontrado correctamente");
+                                                   idCursoSeleccionado.setText(String.valueOf(curso.getId()));
+                                                   Cursos encontrado = CS.BuscarCurso(curso);
+                                                   if (encontrado !=null){
+                                                       NombreTxt.setText(encontrado.getNombre_curso());
+                                                       NivelTxt.setText(encontrado.getNivel());
+                                                       CupoTxt.setText(String.valueOf(encontrado.getCupo_Maximo()));
+                                                       JOptionPane.showMessageDialog(null, "curso encontrado correctamente");
 
-            }
-                    else {
-                        JOptionPane.showMessageDialog(null, "curso NO encontrado");
-                    }
-        }
-        }
+                                                   }
+                                                   else {
+                                                       JOptionPane.showMessageDialog(null, "curso NO encontrado");
+                                                   }
+                                               }
+                                           }
         );
     }
     private void ListarCursos()  {
-                        List<Cursos>ListaCursos= null;
-                        try {
-                            ListaCursos = CS.listarCursos();
-                        } catch (SQLException ex) {
-                            throw new RuntimeException(ex);
-                        }
-                        ModeloCurso.setRowCount(0);
-                        ModeloCurso= (DefaultTableModel) TablaCursos.getModel();
+        List<Cursos>ListaCursos= null;
+        try {
+            ListaCursos = CS.listarCursos();
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+        ModeloCurso.setRowCount(0);
+        ModeloCurso= (DefaultTableModel) TablaCursos.getModel();
         Object[] Objeto =new Object[4];
         for (int i=0; i<ListaCursos.size();i++){
             Objeto[0]=ListaCursos.get(i).getId();
@@ -334,5 +334,5 @@ public class RegistroCursos extends javax.swing.JFrame {
 
 
 
-    }
+}
 

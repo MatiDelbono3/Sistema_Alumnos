@@ -37,7 +37,7 @@ public class AlumnoDAO {
              ResultSet rs=ps.executeQuery()){
             while (rs.next()){
                 Alumnos alumno=new Alumnos();
-                alumno.setId(rs.getInt(1));
+                alumno.setId(rs.getString(1));
                 alumno.setNombre(rs.getString(2));
                 alumno.setApellido(rs.getString(3));
                 alumno.setFecha_Nacimiento(rs.getDate(4));
@@ -58,7 +58,7 @@ public class AlumnoDAO {
              ps.setInt(1, id);
              ResultSet rs=ps.executeQuery();
             if (rs.next()){
-                AlumnoPorId.setId(rs.getInt(1));
+                AlumnoPorId.setId(rs.getString(1));
                 AlumnoPorId.setNombre(rs.getString(2));
                 AlumnoPorId.setApellido(rs.getString(3));
                 AlumnoPorId.setFecha_Nacimiento(rs.getDate(4));
@@ -71,6 +71,7 @@ public class AlumnoDAO {
         }
         return null;
     }
+
     public boolean existeAlumno(int Id){
         String Sql="Select * from estudiantes WHERE Id= ? LIMIT 1 ";
         try (Connection conexion= cn.Connect();

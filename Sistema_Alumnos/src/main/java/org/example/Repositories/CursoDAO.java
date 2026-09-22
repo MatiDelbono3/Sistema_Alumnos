@@ -53,7 +53,7 @@ public class CursoDAO {
              ResultSet rs=ps.executeQuery()){
             while (rs.next()){
                 Cursos curso=new Cursos();
-                curso.setId(rs.getInt(1));
+                curso.setId(String.valueOf(rs.getInt(1)));
                 curso.setNombre_curso(rs.getString(2));
                 curso.setNivel(rs.getString(3));
                 curso.setCupo_Maximo(rs.getInt(4));
@@ -104,6 +104,26 @@ public class CursoDAO {
         }
         return false;
     }
+    public Cursos ObtenerCursoPorId(int id) {
+        String sql = "SELECT * FROM cursos WHERE Id = ?";
+        try (Connection conexion = cn.Connect();
+             PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Cursos curso = new Cursos();
+                    curso.setId(String.valueOf(rs.getInt("Id")));
+                    curso.setNombre_curso(rs.getString("nombre_curso"));
+                    curso.setNivel(rs.getString("nivel"));
+                    curso.setCupo_Maximo(rs.getInt("cupo_maximo"));
+                    return curso;
+                }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al obtener el curso por ID");
+        }
+        return null;
+    }
     public Cursos BuscarCurso(Cursos curso){
         String Sql="select Id, nombre_curso, nivel, cupo_maximo from Cursos  where Id= ? ";
         try (Connection conexion= cn.Connect();
@@ -111,7 +131,7 @@ public class CursoDAO {
             ps.setInt(1, curso.getId());
             ResultSet rs=ps.executeQuery();
             if (rs. next() ){
-                curso.setId(rs.getInt(1));
+                curso.setId(String.valueOf(rs.getInt(1)));
                 curso.setNombre_curso(rs.getString(2));
                 curso.setNivel(rs.getString(3));
                 curso.setCupo_Maximo(rs.getInt(4));

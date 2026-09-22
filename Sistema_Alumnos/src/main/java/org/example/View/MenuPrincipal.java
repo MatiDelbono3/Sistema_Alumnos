@@ -145,6 +145,14 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 Insc.setVisible(true);
             }
         });
+        botonAsistencias.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RegistroAsistencias Asis = null;
+                Asis=new RegistroAsistencias();
+                Asis.setVisible(true);
+            }
+        });
 
     }
     void limpiarDatosCurso(){

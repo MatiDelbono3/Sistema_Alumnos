@@ -314,7 +314,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
             }
             AlumnoTxt.setVisible(true);
             int id=Integer.parseInt(AlumnoTxt.getText());
-            alumno.setId(id);
+            alumno.setId(String.valueOf(id));
             labelAlumnoABuscar.setVisible(true);
 
             AlumnoTxt.setText(String.valueOf(alumno.getId()));
