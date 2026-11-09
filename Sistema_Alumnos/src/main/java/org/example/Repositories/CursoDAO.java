@@ -1,11 +1,9 @@
 package org.example.Repositories;
 
 import org.example.Connections.Connections;
-import org.example.DTO.Alumnos;
 import org.example.DTO.Cursos;
 
 import javax.swing.*;
-import java.awt.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +29,12 @@ public class CursoDAO {
             return 0;
         }
     }
-    public boolean existeCurso(int idCurso){
+    public boolean existeCurso(String idCurso){
         String Sql="Select * from cursos WHERE Id= ? LIMIT 1 ";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ( conexion.prepareStatement(Sql))){;
 
-             ps.setInt(1, idCurso);
+             ps.setString(1, idCurso);
         try (ResultSet rs = ps.executeQuery()) {
             return rs.next();
         }
@@ -70,7 +68,7 @@ public class CursoDAO {
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = (conexion.prepareStatement(Sql))){
             ps.setInt(1, curso.getCupo_Maximo());
-            ps.setInt(2, curso.getId());
+            ps.setString(2, curso.getId());
             int filasAfectadas= ps.executeUpdate();
             if (filasAfectadas > 0 ){
                 System.out.println("Curso modificado con éxito");
@@ -88,7 +86,7 @@ public class CursoDAO {
         String sql="delete from cursos where Id =?";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = (conexion.prepareStatement(sql))){
-            ps.setInt(1, curso.getId());
+            ps.setString(1, curso.getId());
 
             int filasAfectadas= ps.executeUpdate();
             if (filasAfectadas > 0 ){
@@ -128,7 +126,7 @@ public class CursoDAO {
         String Sql="select Id, nombre_curso, nivel, cupo_maximo from Cursos  where Id= ? ";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = (conexion.prepareStatement(Sql))){
-            ps.setInt(1, curso.getId());
+            ps.setString(1, curso.getId());
             ResultSet rs=ps.executeQuery();
             if (rs. next() ){
                 curso.setId(String.valueOf(rs.getInt(1)));

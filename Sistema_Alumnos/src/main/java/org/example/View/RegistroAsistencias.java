@@ -38,6 +38,7 @@ public class RegistroAsistencias extends javax.swing.JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         initComponents();
+        MenuNavigation.instalarVolverAlMenu(this);
     }
 
     private void initComponents() {

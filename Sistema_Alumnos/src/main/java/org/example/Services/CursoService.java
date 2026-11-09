@@ -34,7 +34,7 @@ public class CursoService {
         cursoDAO.editarCurso(curso);
     }
     public void eliminarCurso(Cursos curso){
-        if (inscripcionDAO.tieneAlumnosInscriptos(curso.getId())){
+        if (inscripcionDAO.tieneAlumnosInscriptos(Integer.parseInt(curso.getId()))){
             throw new IllegalArgumentException("No se puede eliminar un curso con inscripciones");
         }
         if (!cursoDAO.existeCurso(curso.getId())){

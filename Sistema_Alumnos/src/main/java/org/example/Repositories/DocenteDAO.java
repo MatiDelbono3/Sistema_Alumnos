@@ -14,84 +14,73 @@ public class DocenteDAO {
     private final Connections cn=new Connections();
     InscripcionDAO cursoDAO=new InscripcionDAO();
     Inscripciones inscripcion=new Inscripciones();
+    private static final String COLUMNAS_DOCENTE =
+            "Id, Nombre, Apellido, Correo_electronico, Fecha_nacimiento, Fecha_Contratacion, Activo";
+    private Docentes mapearDocente(ResultSet rs) throws SQLException {
+        Docentes docente = new Docentes();
+        docente.setId(rs.getString("Id"));
+        docente.setNombre(rs.getString("Nombre"));
+        docente.setApellido(rs.getString("Apellido"));
+        docente.setCorreo_electronico(rs.getString("Correo_electronico"));
+        docente.setFecha_nacimiento(rs.getDate("Fecha_nacimiento"));
+        docente.setFecha_contratacion(rs.getDate("Fecha_Contratacion"));
+        docente.setActivo(rs.getBoolean("Activo"));
+        return docente;
+    }
     public boolean insertarDocentes(Docentes docente ){
-        String Sql="insert into docentes (Nombre, Apellido, Correo_electronico, fecha_nacimiento, fecha_contratacion, estado ) VALUES (?, ?, ?, ?, ?, ?)";
+        String Sql="insert into docentes (Nombre, Apellido, Correo_electronico, Fecha_nacimiento, Fecha_Contratacion, Activo) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ((Connection) conexion).prepareStatement(Sql)){
             ps.setString(1, docente.getNombre());
             ps.setString(2, docente.getApellido());
-            ps.setString(4, docente.getCorreo_electronico());
-            ps.setDate(3, new java.sql.Date(docente.getFecha_nacimiento().getTime()));
+            ps.setString(3, docente.getCorreo_electronico());
             ps.setDate(4, new java.sql.Date(docente.getFecha_nacimiento().getTime()));
+            ps.setDate(5, new java.sql.Date(docente.getFecha_contratacion().getTime()));
+            ps.setBoolean(6, docente.isActivo());
             int n=ps.executeUpdate();
             System.out.println("Número de filas afectadas: " + n);
-            return true;
+            return n > 0;
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "error al insertar el alumno");
+            JOptionPane.showMessageDialog(null, "Error al registrar el docente: " + e.getMessage());
         }
         return false;
     }
     public List<Docentes> ListarDocentes() throws SQLException {
         List<Docentes>ListaDocentes=new ArrayList<>();
-        String Sql="Select * from docentes ";
+        String Sql="Select " + COLUMNAS_DOCENTE + " from docentes";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ( conexion.prepareStatement(Sql));
              ResultSet rs=ps.executeQuery()){
             while (rs.next()){
-                Docentes docente=new Docentes();
-                docente.setId(rs.getString(1));
-                docente.setNombre(rs.getString(2));
-                docente.setApellido(rs.getString(3));
-                docente.setCorreo_electronico(rs.getString(5));
-                docente.setFecha_nacimiento(rs.getDate(4));
-                docente.setFecha_contratacion(rs.getDate(6));
-                docente.setActivo(rs.getBoolean(7));
-                ListaDocentes.add(docente);
-
+                ListaDocentes.add(mapearDocente(rs));
             }
         } catch (SQLException exc){
-            JOptionPane.showMessageDialog(null, "Error al listar docentes");
+            JOptionPane.showMessageDialog(null, "Error al listar docentes: " + exc.getMessage());
         }
         return ListaDocentes;
     }
     public Docentes ObtenerDocentePorId(int id) throws SQLException {
-        Docentes docentePorId=new Docentes();
-        String Sql="Select Id, Nombre, Apellido, Correo_electronico, fecha_nacimiento, fecha_contratacion, estado from docentes WHERE Id= ? ";
+        String Sql="Select " + COLUMNAS_DOCENTE + " from docentes WHERE Id= ? ";
         try (Connection conexion= cn.Connect();
-             PreparedStatement ps = ( conexion.prepareStatement(Sql))){
+             PreparedStatement ps = conexion.prepareStatement(Sql)){
             ps.setInt(1, id);
-            ResultSet rs=ps.executeQuery();
-            if (rs.next()){
-                docentePorId.setId(rs.getString(1));
-                docentePorId.setNombre(rs.getString(2));
-                docentePorId.setApellido(rs.getString(3));
-                docentePorId.setCorreo_electronico(rs.getString(4));
-                docentePorId.setFecha_nacimiento(rs.getDate(5));
-                docentePorId.setFecha_contratacion(rs.getDate(6));
-                docentePorId.setActivo(rs.getBoolean(7));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapearDocente(rs);
+                }
             }
-        } catch (SQLException exc){
-            JOptionPane.showMessageDialog(null, "Error al obtener el docente por ID");
         }
-        return docentePorId;
+        return null;
     }
     public List<Docentes>DocentesPorNombre(String nombre) throws SQLException {
         List<Docentes>ListaDocentes=new ArrayList<>();
-        String Sql="Select * from docentes WHERE Nombre LIKE ? ";
+        String Sql="Select " + COLUMNAS_DOCENTE + " from docentes WHERE Nombre LIKE ? ";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ( conexion.prepareStatement(Sql))){
             ps.setString(1, "%" + nombre + "%");
             ResultSet rs=ps.executeQuery();
             while (rs.next()){
-                Docentes docente=new Docentes();
-                docente.setId(rs.getString(1));
-                docente.setNombre(rs.getString(2));
-                docente.setApellido(rs.getString(3));
-                docente.setCorreo_electronico(rs.getString(5));
-                docente.setFecha_nacimiento(rs.getDate(4));
-                docente.setFecha_contratacion(rs.getDate(6));
-                docente.setActivo(rs.getBoolean(7));
-                ListaDocentes.add(docente);
+                ListaDocentes.add(mapearDocente(rs));
             }
         } catch (SQLException exc){
             JOptionPane.showMessageDialog(null, "Error al buscar docentes por nombre");
@@ -111,7 +100,7 @@ public class DocenteDAO {
         return false;
     }
     public boolean existeDocente(String Id){
-        String Sql="Select * from docentes WHERE Id= ? LIMIT 1 ";
+        String Sql="Select 1 from docentes WHERE Id= ? LIMIT 1 ";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ( conexion.prepareStatement(Sql)))
         {
@@ -167,21 +156,12 @@ public class DocenteDAO {
     }
     public List<Docentes>ListarActivos() throws SQLException {
         List<Docentes>ListaDocentes=new ArrayList<>();
-        String Sql="Select * from docentes WHERE estado='ACTIVO' ";
+        String Sql="Select " + COLUMNAS_DOCENTE + " from docentes WHERE Activo=1";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ( conexion.prepareStatement(Sql));
              ResultSet rs=ps.executeQuery()){
-            while (rs.next()){
-                Docentes docente=new Docentes();
-                docente.setId(rs.getString(1));
-                docente.setNombre(rs.getString(2));
-                docente.setApellido(rs.getString(3));
-                docente.setCorreo_electronico(rs.getString(5));
-                docente.setFecha_nacimiento(rs.getDate(4));
-                docente.setFecha_contratacion(rs.getDate(6));
-                docente.setActivo(rs.getBoolean(7));
-                ListaDocentes.add(docente);
-
+             while (rs.next()){
+                 ListaDocentes.add(mapearDocente(rs));
             }
         } catch (SQLException exc){
             JOptionPane.showMessageDialog(null, "Error al listar docentes activos");
@@ -190,7 +170,7 @@ public class DocenteDAO {
     }
     public boolean eliminarDocente(String id) throws SQLException {
 
-        String sqlCur="delete from cursos where docente_id=?";
+        String sqlCur="delete from cursos where Id=?";
         String sqlAlu="delete from docentes where Id=?";
         try (Connection conexion =cn.Connect()){
             PreparedStatement psI=(conexion.prepareStatement(sqlCur));

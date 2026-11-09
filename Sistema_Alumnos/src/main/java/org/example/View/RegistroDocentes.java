@@ -1,7 +1,5 @@
 package org.example.View;
 
-import org.example.DTO.Alumnos;
-import org.example.DTO.Cursos;
 import org.example.DTO.Docentes;
 import org.example.Services.DocenteService;
 
@@ -30,6 +28,7 @@ public class RegistroDocentes extends javax.swing.JFrame {
     private JTextField CorreoTxt;
     private JCheckBox ActivoCheckBox;
     private JTextField NuevoCorreoTxt;
+    private JLabel labelNuevoCorreo;
     private JTextField DocenteTxt;
     private JTable TablaDocentes;
 
@@ -39,6 +38,8 @@ public class RegistroDocentes extends javax.swing.JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         initComponents();
+        MenuNavigation.instalarVolverAlMenu(this);
+        ListarDocentes();
     }
 
     private void initComponents() {
@@ -70,7 +71,7 @@ public class RegistroDocentes extends javax.swing.JFrame {
         JLabel labelIdDocente = new JLabel("ID del docente");
         JLabel IdDocenteAEditar = new JLabel("");
 
-        JLabel labelNuevoCorreo = new JLabel("Nuevo Correo Electrónico");
+        labelNuevoCorreo = new JLabel("Nuevo Correo Electrónico");
         labelNuevoCorreo.setFont(new Font("Arial", Font.BOLD, 14));
 
         JLabel labelDocenteAEliminar = new JLabel("Docente a eliminar");
@@ -162,6 +163,18 @@ public class RegistroDocentes extends javax.swing.JFrame {
 
         ModeloDocente = new DefaultTableModel(new String[]{"Id", "Nombre", "Apellido", "Fecha_Nacimiento", "Fecha_Contratacion", "Correo_electronico", "Activo"}, 0);
         TablaDocentes = new JTable(ModeloDocente);
+        TablaDocentes.getSelectionModel().addListSelectionListener(event -> {
+            if (!event.getValueIsAdjusting()) {
+                boolean docenteSeleccionado = TablaDocentes.getSelectedRow() != -1;
+                labelNuevoCorreo.setVisible(docenteSeleccionado);
+                NuevoCorreoTxt.setVisible(docenteSeleccionado);
+                if (!docenteSeleccionado) {
+                    NuevoCorreoTxt.setText("");
+                }
+                PanelRegistroDocentes.revalidate();
+                PanelRegistroDocentes.repaint();
+            }
+        });
         JScrollPane scrollTabla = new JScrollPane(TablaDocentes);
         PanelTablaDocentes.add(scrollTabla, BorderLayout.CENTER);
         add(PanelRegistroDocentes, BorderLayout.NORTH);
@@ -241,12 +254,13 @@ botonEdicionDocentes.addActionListener(new ActionListener() {
                 return;
             }
             String nuevoCorreo = NuevoCorreoTxt.getText();
-            if (nuevoCorreo.isEmpty()) {
+            if (nuevoCorreo.isBlank()) {
                 JOptionPane.showMessageDialog(null, "Ingrese el nuevo correo");
                 return;
             }
-            String idSeleccionado = (DocenteTxt.getText());
-            boolean exito = false;
+            int filaModelo = TablaDocentes.convertRowIndexToModel(fila);
+            String idSeleccionado = ModeloDocente.getValueAt(filaModelo, 0).toString();
+            boolean exito;
             try {
                 exito = DS.editarCorreo(nuevoCorreo, idSeleccionado);
             } catch (SQLException ex) {
@@ -269,14 +283,14 @@ botonEliminacionDocentes.addActionListener(new ActionListener() {
                 JOptionPane.showMessageDialog(null, "Seleccione un docente");
                 return;
             }
-            String idTexto = DocenteTxt.getText().trim();
-            if (idTexto.isEmpty()) {
+            int filaModelo = TablaDocentes.convertRowIndexToModel(fila);
+            Object valorId = ModeloDocente.getValueAt(filaModelo, 0);
+            if (valorId == null || valorId.toString().isBlank()) {
                 JOptionPane.showMessageDialog(null, "No se pudo obtener el ID del docente");
                 return;
             }
-            int idSeleccionado = Integer.parseInt(idTexto);
             try {
-                if (DS.eliminarDocente(String.valueOf(idSeleccionado))) {
+                if (DS.eliminarDocente(valorId.toString())) {
                     JOptionPane.showMessageDialog(null, "Docente eliminado con éxito");
                 } else {
                     JOptionPane.showMessageDialog(null, "Error al eliminar el docente");
@@ -291,43 +305,41 @@ botonEliminacionDocentes.addActionListener(new ActionListener() {
         botonBusquedaDocentes.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String nombreBusqueda = DocenteTxt.getText().trim();
-                if (nombreBusqueda.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Ingrese un nombre para buscar.");
+                String idBusqueda = DocenteTxt.getText().trim();
+                if (idBusqueda.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Ingrese el ID del docente.");
+                    return;
+                }
+
+                int idDocente;
+                try {
+                    idDocente = Integer.parseInt(idBusqueda);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "El ID debe ser un número entero.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 try {
-                    // Buscar docentes por nombre
-                    List<Docentes> docentesEncontrados =  DS.buscarDocentesPorNombre(nombreBusqueda);
-                    if (docentesEncontrados.isEmpty()) {
-                        JOptionPane.showMessageDialog(null, "No se encontraron docentes con el nombre proporcionado.");
+                    Docentes docenteEncontrado = DS.ObtenerDocentePorId(idDocente);
+                    if (docenteEncontrado == null) {
+                        JOptionPane.showMessageDialog(null, "No se encontró un docente con ese ID.");
                         return;
                     }
 
-                    // Mostrar docentes encontrados en la tabla
                     ModeloDocente.setRowCount(0);
-                    for (Docentes docente : docentesEncontrados) {
-                        ModeloDocente.addRow(new Object[]{
-                                docente.getId(),
-                                docente.getNombre(),
-                                docente.getApellido(),
-                                docente.getFecha_nacimiento(),
-                                docente.getFecha_contratacion(),
-                                docente.getCorreo_electronico(),
-                                docente.isActivo()
-                        });
-
-                        // Listar cursos asociados al docente
-                        List<Cursos> cursosDocente = DS.listarCursosPorDocente(docente.getId());
-                        StringBuilder cursosInfo = new StringBuilder("Cursos dictados por " + docente.getNombre() + ":\n");
-                        for (Cursos curso : cursosDocente) {
-                            cursosInfo.append("- ").append(curso.getNombre_curso()).append("\n");
-                        }
-                        JOptionPane.showMessageDialog(null, cursosInfo.toString());
-                    }
+                    ModeloDocente.addRow(new Object[]{
+                            docenteEncontrado.getId(),
+                            docenteEncontrado.getNombre(),
+                            docenteEncontrado.getApellido(),
+                            docenteEncontrado.getFecha_nacimiento(),
+                            docenteEncontrado.getFecha_contratacion(),
+                            docenteEncontrado.getCorreo_electronico(),
+                            docenteEncontrado.isActivo()
+                    });
                 } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Error al buscar docentes: " + ex.getMessage());
+                    JOptionPane.showMessageDialog(null, "Error al buscar el docente: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                } catch (IllegalArgumentException ex) {
+                    JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -347,9 +359,9 @@ botonEliminacionDocentes.addActionListener(new ActionListener() {
                 Objeto[0] = listaDocente.getId();
                 Objeto[1] = listaDocente.getNombre();
                 Objeto[2] = listaDocente.getApellido();
-                Objeto[3] = listaDocente.getCorreo_electronico();
-                Objeto[4] = listaDocente.getFecha_nacimiento();
-                Objeto[5] = listaDocente.getFecha_contratacion();
+                Objeto[3] = listaDocente.getFecha_nacimiento();
+                Objeto[4] = listaDocente.getFecha_contratacion();
+                Objeto[5] = listaDocente.getCorreo_electronico();
                 Objeto[6] = listaDocente.isActivo();
                 ModeloDocente.addRow(Objeto);
             }
@@ -359,6 +371,7 @@ botonEliminacionDocentes.addActionListener(new ActionListener() {
             NombreTxt.setText("");
             ApellidoTxt.setText("");
             CorreoTxt.setText("");
+            NuevoCorreoTxt.setText("");
             FechaNacimientoTxt.setText("");
             FechaContratacionTxt.setText("");
             ActivoCheckBox.setSelected(false);

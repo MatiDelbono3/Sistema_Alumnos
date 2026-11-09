@@ -1,35 +1,35 @@
 package org.example.DTO;
 import java.time.LocalDate;
-import java.util.Date;
+
 public class Inscripciones {
-    private int id;
-    private int id_Alumno;
-    private int id_Curso;
+    private String id;
+    private String id_Alumno;
+    private String id_Curso;
     private LocalDate fechaInscripcion;
     private String estado;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.id = String.valueOf(id);
     }
 
-    public int getId_Alumno() {
+    public String getId_Alumno() {
         return id_Alumno;
     }
 
     public void setId_Alumno(String id_Alumno) {
-        this.id_Alumno = Integer.parseInt(id_Alumno);
+        this.id_Alumno = String.valueOf(Integer.parseInt(id_Alumno));
     }
 
-    public int getId_Curso() {
+    public String getId_Curso() {
         return id_Curso;
     }
 
     public void setId_Curso(String id_Curso) {
-        this.id_Curso = Integer.parseInt(id_Curso);
+        this.id_Curso = String.valueOf(Integer.parseInt(id_Curso));
     }
 
     public LocalDate getFechaInscripcion() {

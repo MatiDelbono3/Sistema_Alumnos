@@ -19,8 +19,7 @@ public class AlumnoService {
             throw new IllegalArgumentException("Ya existe un alumno con ese correo.");
         }
 
-        alumnoDAO.insertarAlumnos(alumno);
-        return false;
+        return alumnoDAO.insertarAlumnos(alumno) > 0;
     }
 
     public boolean editarCorreo(String nuevoCorreo, int idAlumno) {

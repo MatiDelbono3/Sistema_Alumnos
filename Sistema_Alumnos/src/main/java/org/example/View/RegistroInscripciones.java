@@ -4,7 +4,7 @@ import org.example.DTO.Alumnos;
 import org.example.DTO.Cursos;
 import org.example.DTO.Inscripciones;
 import org.example.DTO.Usuarios;
-import org.example.Repositories.CursoDAO;
+import org.example.Services.AlumnoService;
 import org.example.Services.CursoService;
 import org.example.Services.InscripcionService;
 
@@ -15,7 +15,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class RegistroInscripciones extends JFrame {
@@ -23,13 +29,13 @@ public class RegistroInscripciones extends JFrame {
     Usuarios usuario=new Usuarios();
     CursoService CS=new CursoService();
     InscripcionService IS=new InscripcionService();
-    CursoService CuS=new CursoService();
+    AlumnoService AS=new AlumnoService();
     Inscripciones inscripcion=new Inscripciones();
     DefaultTableModel ModeloInscripcion=new DefaultTableModel();
 
     private JTextField IdTxt;
-    private JTextField IdAlumnoTxt;
-    private JTextField IdCursoTxt;
+    private JComboBox<Alumnos> IdAlumnoTxt;
+    private JComboBox<Cursos> IdCursoTxt;
     private JTextField FechaInscripcionTxt;
     private JTextField EstadoTxt;
     private JTextField InscripcionAEliminarTxt;
@@ -37,42 +43,70 @@ public class RegistroInscripciones extends JFrame {
     private JTextField IdCursoABuscarTxt;
     private JTextField IdAlumnoABuscarTxt;
     private JTable TablaInscripciones;
+    private final List<Alumnos> alumnosDisponibles = new ArrayList<>();
+    private final List<Cursos> cursosDisponibles = new ArrayList<>();
+    private final Map<String, Alumnos> alumnosPorId = new HashMap<>();
+    private final Map<String, Cursos> cursosPorId = new HashMap<>();
 
 
 
 
     public RegistroInscripciones() {
         setTitle("Registro Inscripciones");
-        setSize(600,500);
+        setSize(1100,900);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        cargarAlumnosYCursos();
         initComponents();
+        MenuNavigation.instalarVolverAlMenu(this);
         ListarInscripciones();
     }
+
+    private void cargarAlumnosYCursos() {
+        try {
+            for (Alumnos alumno : AS.listarAlumnos()) {
+                alumnosDisponibles.add(alumno);
+                alumnosPorId.put(alumno.getId(), alumno);
+            }
+            for (Cursos curso : CS.listarCursos()) {
+                cursosDisponibles.add(curso);
+                cursosPorId.put(curso.getId(), curso);
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No se pudieron cargar alumnos y cursos: " + ex.getMessage(),
+                    "Error de base de datos",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     private void initComponents(){
         setLayout(new BorderLayout());
         // Panel para registro de curso
         JPanel PanelRegistro = new JPanel();
-        PanelRegistro.setLayout(new GridLayout(4,2,10,10)); // 4 filas, 2 columnas
+        PanelRegistro.setLayout(new GridLayout(0,2,10,10));
         PanelRegistro.setBackground(Color.LIGHT_GRAY);
 
         // labels
 
 
-        JLabel labelIdAlumno = new JLabel("id Alumno");
+        JLabel labelIdAlumno = new JLabel("Alumno");
         labelIdAlumno.setFont(new Font("Arial", Font.BOLD, 14));
 
-        JLabel labelIdCurso = new JLabel("id curso");
+        JLabel labelIdCurso = new JLabel("Curso");
         labelIdCurso.setFont(new Font("Arial", Font.BOLD, 14));
 
-        JLabel labelFechaInscripcion = new JLabel("Fecha Inscripcion");
+        JLabel labelFechaInscripcion = new JLabel("Fecha Inscripcion (dd/MM/aaaa o aaaa-MM-dd)");
         labelFechaInscripcion.setFont(new Font("Arial", Font.BOLD, 14));
 
         JLabel labelEstado = new JLabel("Estado");
         labelEstado.setFont(new Font("Arial", Font.BOLD, 14));
 
-        JLabel labelIdInscripcion = new JLabel("ID del Curso: ");
+        JLabel labelIdInscripcion = new JLabel("ID de la inscripción:");
         JLabel idInsccripcionSeleccionada = new JLabel(""); // Inscripción seleccionado para modificar
+        labelIdInscripcion.setVisible(false);
+        idInsccripcionSeleccionada.setVisible(false);
 
         JLabel labelnuevoEstado=new JLabel("Nuevo estado");
         labelnuevoEstado.setFont(new Font("Arial", Font.BOLD, 14));
@@ -82,11 +116,9 @@ public class RegistroInscripciones extends JFrame {
 
         JLabel labelCursoABuscar=new JLabel("Id  curso a buscar");
         labelCursoABuscar.setFont(new Font("Arial", Font.BOLD, 14));
-        labelCursoABuscar.setVisible(false);
 
         JLabel labelAlumnoABuscar=new JLabel("Id  alumno a buscar");
         labelAlumnoABuscar.setFont(new Font("Arial", Font.BOLD, 14));
-        labelAlumnoABuscar.setVisible(false);
         JComboBox<String> comboBuscar = new JComboBox<>();
         comboBuscar.addItem("Inscripciones por Alumno");
         comboBuscar.addItem("Inscripciones por Curso");
@@ -96,8 +128,9 @@ public class RegistroInscripciones extends JFrame {
 
 
         IdTxt=new JTextField(10);
-        IdAlumnoTxt = new JTextField(10);
-        IdCursoTxt = new JTextField(10);
+        IdAlumnoTxt = new JComboBox<>(alumnosDisponibles.toArray(new Alumnos[0]));
+        IdCursoTxt = new JComboBox<>(cursosDisponibles.toArray(new Cursos[0]));
+        configurarRenderizadores();
         FechaInscripcionTxt=new JTextField(10);
         EstadoTxt = new JTextField(10);
         NuevoEstadoTxt=new JTextField(10);
@@ -106,6 +139,9 @@ public class RegistroInscripciones extends JFrame {
         IdAlumnoABuscarTxt=new JTextField(10);
         NuevoEstadoTxt.setVisible(false);
         IdCursoABuscarTxt.setVisible(false);
+        labelCursoABuscar.setVisible(false);
+        IdAlumnoABuscarTxt.setVisible(true);
+        labelAlumnoABuscar.setVisible(true);
 
 
 
@@ -180,21 +216,35 @@ public class RegistroInscripciones extends JFrame {
 
         // Estilos de texto
         IdTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        IdAlumnoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        IdCursoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         FechaInscripcionTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         EstadoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         NuevoEstadoTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         InscripcionAEliminarTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        IdCursoABuscarTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        IdAlumnoABuscarTxt.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+
+        comboBuscar.addActionListener(e -> {
+            String opcion = String.valueOf(comboBuscar.getSelectedItem());
+            boolean buscarPorAlumno = Objects.equals(opcion, "Inscripciones por Alumno")
+                    || Objects.equals(opcion, "Cursos por Alumno");
+            labelAlumnoABuscar.setVisible(buscarPorAlumno);
+            IdAlumnoABuscarTxt.setVisible(buscarPorAlumno);
+            labelCursoABuscar.setVisible(!buscarPorAlumno);
+            IdCursoABuscarTxt.setVisible(!buscarPorAlumno);
+            PanelRegistro.revalidate();
+            PanelRegistro.repaint();
+        });
         botonRegistroInscripcion.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (IdAlumnoTxt.getText().isBlank()){
-                    JOptionPane.showMessageDialog(null, "Ingrese el id del alumno.", "Error", JOptionPane.ERROR_MESSAGE);
+                Alumnos alumnoSeleccionado = (Alumnos) IdAlumnoTxt.getSelectedItem();
+                if (alumnoSeleccionado == null){
+                    JOptionPane.showMessageDialog(null, "Seleccione un alumno.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                if (IdCursoTxt.getText().isBlank()){
-                    JOptionPane.showMessageDialog(null, "Ingrese el id del curso.", "Error", JOptionPane.ERROR_MESSAGE);
+                Cursos cursoSeleccionado = (Cursos) IdCursoTxt.getSelectedItem();
+                if (cursoSeleccionado == null){
+                    JOptionPane.showMessageDialog(null, "Seleccione un curso.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 if (FechaInscripcionTxt.getText().isBlank()){
@@ -205,20 +255,53 @@ public class RegistroInscripciones extends JFrame {
                     JOptionPane.showMessageDialog(null, "Ingrese el estado.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                inscripcion.setId_Alumno(IdAlumnoTxt.getText());
-                inscripcion.setId_Curso(IdCursoTxt.getText());
-                inscripcion.setFechaInscripcion(LocalDate.parse(FechaInscripcionTxt.getText()));
-                inscripcion.setEstado(EstadoTxt.getText());
-
-
-
-
-
-                IS.insertarInscripciones(inscripcion);
+                LocalDate fechaInscripcion;
+                try {
+                    fechaInscripcion = parseFechaInscripcion(FechaInscripcionTxt.getText().trim());
+                } catch (DateTimeParseException ex) {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Ingrese una fecha válida en formato dd/MM/aaaa o aaaa-MM-dd.",
+                            "Fecha inválida",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                try {
+                    inscripcion.setId_Alumno(alumnoSeleccionado.getId());
+                    inscripcion.setId_Curso(cursoSeleccionado.getId());
+                    inscripcion.setFechaInscripcion(fechaInscripcion);
+                    inscripcion.setEstado(EstadoTxt.getText());
+                    IS.insertarInscripciones(inscripcion);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(
+                            RegistroInscripciones.this,
+                            "Ingrese un ID numérico válido.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                } catch (IllegalArgumentException ex) {
+                    JOptionPane.showMessageDialog(
+                            RegistroInscripciones.this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(
+                            RegistroInscripciones.this,
+                            "No se pudo registrar la inscripción: " + ex.getMessage(),
+                            "Error de base de datos",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(
+                            RegistroInscripciones.this,
+                            "No se pudo registrar la inscripción: " + ex.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
                 JOptionPane.showMessageDialog(
-                        null,
-                        "Inscripcion registrada con éxito");
+                        RegistroInscripciones.this,
+                        "Inscripción registrada con éxito");
 
                 ListarInscripciones();
                 limpiarDatosInscripcion();
@@ -228,7 +311,8 @@ public class RegistroInscripciones extends JFrame {
             if (!e.getValueIsAdjusting()) {
                 int FilaSeleccionada=TablaInscripciones.getSelectedRow();
                 if (FilaSeleccionada != -1 ){
-                    int IdInscripcionSeleccionada= (int) TablaInscripciones.getValueAt(FilaSeleccionada, 0);
+                    int IdInscripcionSeleccionada = Integer.parseInt(
+                            String.valueOf(TablaInscripciones.getValueAt(FilaSeleccionada, 0)));
                     idInsccripcionSeleccionada.setText(String.valueOf(IdInscripcionSeleccionada));
                     InscripcionAEliminarTxt.setText(String.valueOf(IdInscripcionSeleccionada));
                     if (IdInscripcionSeleccionada > 0) {
@@ -237,6 +321,8 @@ public class RegistroInscripciones extends JFrame {
                         labelIdInscripcion.setVisible(true);
                         labelnuevoEstado.setVisible(true);
                         NuevoEstadoTxt.setVisible(true);
+                        PanelRegistro.revalidate();
+                        PanelRegistro.repaint();
 
                     } else {
                         JOptionPane.showMessageDialog(null, "Error al obtener el ID del curso");
@@ -284,42 +370,72 @@ public class RegistroInscripciones extends JFrame {
       botonBuscarInscripcion.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            int idCurso= Integer.parseInt(IdCursoABuscarTxt.getText());
-            if (idCurso<=0){
-                JOptionPane.showMessageDialog(null, "Error al obtener el ID del curso");
-                return;
-            }
-
-            List<Inscripciones> lista=null;
-            List<Alumnos>alumnos=null;
-            List<Cursos> cursos=null;
-            if (Objects.equals(comboBuscar.getSelectedItem(), "Inscripciones por Curso")) {
-                lista=IS.BuscarInscripcionesPorCurso(idCurso);
-            } else if (Objects.equals(comboBuscar.getSelectedItem(), "Inscripciones por Alumno")) {
-                int idAlumno=Integer.parseInt(IdAlumnoABuscarTxt.getText());
-                lista=IS.BuscarInscripcionesPorAlumno(idAlumno);
-                cargarTabla(lista);
-            }
-            else if (Objects.equals(comboBuscar.getSelectedItem(), "Alumnos por Curso"))
-            {
-                alumnos=IS.BuscarAlumnosPorCurso(idCurso);
-                cargarTablaAlumnos(alumnos);
-            }
-            else  {
-                try {
-                    int idAlumno=Integer.parseInt(IdAlumnoABuscarTxt.getText());
-                    cursos=IS.BuscarCursosPorAlumno(idAlumno);
-                    cargarTablaCursos(cursos);
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
+            try {
+                String opcion = String.valueOf(comboBuscar.getSelectedItem());
+                if (Objects.equals(opcion, "Inscripciones por Curso")) {
+                    cargarTabla(IS.BuscarInscripcionesPorCurso(IdCursoABuscarTxt.getText()));
+                } else if (Objects.equals(opcion, "Inscripciones por Alumno")) {
+                    cargarTabla(IS.BuscarInscripcionesPorAlumno(IdAlumnoABuscarTxt.getText()));
+                } else if (Objects.equals(opcion, "Alumnos por curso")) {
+                    cargarTablaAlumnos(IS.BuscarAlumnosPorCurso(IdCursoABuscarTxt.getText()));
+                } else {
+                    cargarTablaCursos(IS.BuscarCursosPorAlumno(IdAlumnoABuscarTxt.getText()));
                 }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Ingrese un ID numérico válido.", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
             }
-
-            assert lista != null;
-            cargarTabla(lista);
         }
       });
     }
+
+    private void configurarRenderizadores() {
+        IdAlumnoTxt.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(
+                    JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Alumnos) {
+                    Alumnos alumno = (Alumnos) value;
+                    setText(formatoAlumno(alumno));
+                }
+                return this;
+            }
+        });
+        IdCursoTxt.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(
+                    JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Cursos) {
+                    Cursos curso = (Cursos) value;
+                    setText(formatoCurso(curso));
+                }
+                return this;
+            }
+        });
+    }
+
+    private String formatoAlumno(Alumnos alumno) {
+        return alumno.getNombre() + " " + alumno.getApellido() + " (ID: " + alumno.getId() + ")";
+    }
+
+    private String formatoCurso(Cursos curso) {
+        return curso.getNombre_curso() + " - " + curso.getNivel() + " (ID: " + curso.getId() + ")";
+    }
+
+    static LocalDate parseFechaInscripcion(String fecha) {
+            try {
+                return LocalDate.parse(fecha);
+            } catch (DateTimeParseException ex) {
+                DateTimeFormatter formatoDiaMesAnio = DateTimeFormatter.ofPattern("d/M/uuuu")
+                        .withResolverStyle(ResolverStyle.STRICT);
+                return LocalDate.parse(fecha, formatoDiaMesAnio);
+            }
+        }
 
         private void ListarInscripciones()  {
             List<Inscripciones>ListaInscripciones= null;
@@ -328,32 +444,33 @@ public class RegistroInscripciones extends JFrame {
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
-            ModeloInscripcion.setRowCount(0);
-            ModeloInscripcion= (DefaultTableModel) TablaInscripciones.getModel();
-            Object[] Objeto =new Object[5];
-            for (int i=0; i<ListaInscripciones.size();i++){
-                Objeto[0]=ListaInscripciones.get(i).getId();
-                Objeto[1]=ListaInscripciones.get(i).getId_Alumno();
-                Objeto[2]=ListaInscripciones.get(i).getId_Curso();
-                Objeto[3]=ListaInscripciones.get(i).getFechaInscripcion();
-                Objeto[4]=ListaInscripciones.get(i).getEstado();
-                ModeloInscripcion.addRow(Objeto);
-            }
-            TablaInscripciones.setModel(ModeloInscripcion);
+            cargarTabla(ListaInscripciones);
         }
 private void cargarTabla(List<Inscripciones> lista) {
+    ModeloInscripcion.setColumnIdentifiers(
+            new String[]{"ID inscripción", "Alumno (ID)", "Curso (ID)", "Fecha inscripción", "Estado"});
     ModeloInscripcion.setRowCount(0);
 
     for (Inscripciones i : lista) {
         ModeloInscripcion.addRow(new Object[]{
                 i.getId(),
-                i.getId_Alumno(),
-                i.getId_Curso(),
+                nombreAlumnoConId(i.getId_Alumno()),
+                nombreCursoConId(i.getId_Curso()),
                 i.getFechaInscripcion(),
                 i.getEstado()
         });
     }
 }
+
+    private String nombreAlumnoConId(String idAlumno) {
+        Alumnos alumno = alumnosPorId.get(idAlumno);
+        return alumno == null ? "ID: " + idAlumno : formatoAlumno(alumno);
+    }
+
+    private String nombreCursoConId(String idCurso) {
+        Cursos curso = cursosPorId.get(idCurso);
+        return curso == null ? "ID: " + idCurso : formatoCurso(curso);
+    }
     private void cargarTablaAlumnos(List<Alumnos> alumnos) {
         ModeloInscripcion.setColumnIdentifiers(
                 new String[]{"ID", "Nombre", "Apellido", "Correo"}
@@ -388,8 +505,8 @@ private void cargarTabla(List<Inscripciones> lista) {
     }
 
         private void limpiarDatosInscripcion(){
-            IdAlumnoTxt.setText("");
-            IdCursoTxt.setText("");
+            IdAlumnoTxt.setSelectedIndex(IdAlumnoTxt.getItemCount() > 0 ? 0 : -1);
+            IdCursoTxt.setSelectedIndex(IdCursoTxt.getItemCount() > 0 ? 0 : -1);
             FechaInscripcionTxt.setText("");
             EstadoTxt.setText("");
 
@@ -409,7 +526,3 @@ private void cargarTabla(List<Inscripciones> lista) {
                     new RegistroInscripciones().setVisible(true));
         }
       };
-
-
-
-

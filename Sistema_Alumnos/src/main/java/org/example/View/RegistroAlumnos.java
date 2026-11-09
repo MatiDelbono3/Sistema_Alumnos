@@ -38,6 +38,7 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         initComponents();
+        MenuNavigation.instalarVolverAlMenu(this);
         ListarAlumnos();
     }
     private void initComponents(){
@@ -212,20 +213,21 @@ public class RegistroAlumnos extends javax.swing.JFrame {
         });
         TablaAlumnos.getSelectionModel().addListSelectionListener(e ->{
             if (!e.getValueIsAdjusting()) {
-                int FilaSeleccionada=TablaAlumnos.getSelectedRow();
-                if (FilaSeleccionada != -1){
-                    int IdAlumnoSeleccionado= (int) TablaAlumnos.getValueAt(FilaSeleccionada, 0);
-                    AlumnoTxt.setText(String.valueOf(IdAlumnoSeleccionado));
-                    if (IdAlumnoSeleccionado > 0){
-                        IdAlumnoaeditar.setVisible(true);
-                        labelIdAlumno.setVisible(true);
-                        labelNuevocorreo.setVisible(true);
-                        NuevoCorreoTxt.setVisible(true);
-                    }
-                    else {
-                        JOptionPane.showMessageDialog(null, "error al obtener el ID del alumno");
-                    }
+                int filaSeleccionada = TablaAlumnos.getSelectedRow();
+                boolean alumnoSeleccionado = filaSeleccionada != -1;
+                if (alumnoSeleccionado) {
+                    int filaModelo = TablaAlumnos.convertRowIndexToModel(filaSeleccionada);
+                    Object idAlumno = ModeloAlumno.getValueAt(filaModelo, 0);
+                    alumnoSeleccionado = idAlumno != null && !idAlumno.toString().isBlank();
+                    AlumnoTxt.setText(alumnoSeleccionado ? idAlumno.toString() : "");
+                } else {
+                    AlumnoTxt.setText("");
                 }
+                labelIdAlumno.setVisible(alumnoSeleccionado);
+                labelNuevocorreo.setVisible(alumnoSeleccionado);
+                NuevoCorreoTxt.setVisible(alumnoSeleccionado);
+                PanelRegistroAlumnos.revalidate();
+                PanelRegistroAlumnos.repaint();
             }
         });
         botonEdicionAlumnos.addActionListener(new ActionListener() {
@@ -308,33 +310,39 @@ public class RegistroAlumnos extends javax.swing.JFrame {
      botonBusquedaAlumnos.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (AlumnoTxt.getText().isEmpty()){
-                JOptionPane.showMessageDialog(null, "Error al obtener el ID del alumno");
+            String idBusqueda = AlumnoTxt.getText().trim();
+            if (idBusqueda.isEmpty()){
+                JOptionPane.showMessageDialog(null, "Ingrese el ID del alumno.");
                 return;
             }
-            AlumnoTxt.setVisible(true);
-            int id=Integer.parseInt(AlumnoTxt.getText());
-            alumno.setId(String.valueOf(id));
-            labelAlumnoABuscar.setVisible(true);
-
-            AlumnoTxt.setText(String.valueOf(alumno.getId()));
-            Alumnos Alumnoencontrado = null;
+            int id;
             try {
-                Alumnoencontrado = AS.ObtenerAlumnosPorId(id);
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
+                id = Integer.parseInt(idBusqueda);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "El ID debe ser un número entero.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
-            if (Alumnoencontrado !=null){
-                NombreTxt.setText(Alumnoencontrado.getNombre());
-                ApellidoTxt.setText(Alumnoencontrado.getApellido());
-                FechaNacimientoTxt.setText(String.valueOf(Alumnoencontrado.getFecha_Nacimiento()));
-                CorreoTxt.setText(Alumnoencontrado.getCorreo_electronico());
-                JOptionPane.showMessageDialog(null, "alumno encontrado correctamente");
 
+            Alumnos alumnoEncontrado;
+            try {
+                alumnoEncontrado = AS.ObtenerAlumnosPorId(id);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Error al buscar el alumno: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
-            else {
-                JOptionPane.showMessageDialog(null, "alumno NO encontrado");
+            if (alumnoEncontrado == null){
+                JOptionPane.showMessageDialog(null, "No se encontró un alumno con ese ID.");
+                return;
             }
+
+            ModeloAlumno.setRowCount(0);
+            ModeloAlumno.addRow(new Object[]{
+                    alumnoEncontrado.getId(),
+                    alumnoEncontrado.getNombre(),
+                    alumnoEncontrado.getApellido(),
+                    alumnoEncontrado.getFecha_Nacimiento(),
+                    alumnoEncontrado.getCorreo_electronico()
+            });
         }
     }
         );
@@ -377,4 +385,3 @@ public class RegistroAlumnos extends javax.swing.JFrame {
                 new RegistroAlumnos().setVisible(true));
     }
         }
-

@@ -23,8 +23,7 @@ public class DocenteService {
         if (!docenteDAO.existeDocente(String.valueOf(idDocente))) {
             throw new IllegalArgumentException("El docente no existe.");
         }
-        docenteDAO.editarCorreo(nuevoCorreo, idDocente);
-        return true;
+        return docenteDAO.editarCorreo(nuevoCorreo, idDocente);
     }
     public List<Docentes> listarDocentes() throws SQLException {
         return docenteDAO.ListarDocentes();
@@ -37,11 +36,7 @@ public Docentes ObtenerDocentePorId(int id) throws SQLException {
         return docente;
     }
     public List<Docentes> buscarDocentesPorNombre(String nombre) throws SQLException {
-        Docentes docente = (Docentes) docenteDAO.DocentesPorNombre(nombre);
-        if (docente == null) {
-            throw new IllegalArgumentException("Docente inexistente.");
-        }
-        return docente;
+        return docenteDAO.DocentesPorNombre(nombre);
     }
     public List<Cursos> listarCursosPorDocente(String idDocente) throws SQLException {
         if (!docenteDAO.existeDocente((idDocente))) {

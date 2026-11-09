@@ -129,20 +129,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 Insc.setVisible(true);
             }
         });
-        botonInscripciones.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                RegistroInscripciones Insc = null;
-                Insc=new RegistroInscripciones();
-                Insc.setVisible(true);
-            }
-        });
         botonProfesores.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                RegistroInscripciones Insc = null;
-                Insc=new RegistroInscripciones();
-                Insc.setVisible(true);
+                RegistroDocentes docentes = new RegistroDocentes();
+                docentes.setVisible(true);
             }
         });
         botonAsistencias.addActionListener(new ActionListener() {
@@ -165,7 +156,6 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 new MenuPrincipal().setVisible(true));
     };
         }
-
 
 
 

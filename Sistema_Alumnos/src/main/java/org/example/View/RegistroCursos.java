@@ -38,6 +38,7 @@ public class RegistroCursos extends javax.swing.JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         initComponents();
+        MenuNavigation.instalarVolverAlMenu(this);
         ListarCursos();
     }
     private void initComponents(){
@@ -335,4 +336,3 @@ public class RegistroCursos extends javax.swing.JFrame {
 
 
 }
-

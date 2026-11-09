@@ -6,26 +6,24 @@ import org.example.DTO.Inscripciones;
 
 import javax.swing.*;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class InscripcionDAO {
     private final Connections cn=new Connections();
 
-    public void insertarInscripciones(Inscripciones inscripcion){
-        String Sql="insert into inscripciones ( estudiante_id, curso_id, fecha_inscripcion, estado) VALUES (?, ?, ?, ?, ?)";
+    public void insertarInscripciones(Inscripciones inscripcion) throws SQLException {
+        String Sql="insert into inscripciones ( estudiante_id, curso_id, fecha_inscripcion, estado) VALUES (?, ?, ?, ?)";
         try (Connection conexion= cn.Connect();
-             PreparedStatement ps = ((Connection) conexion).prepareStatement(Sql)){
-            ps.setInt(1, inscripcion.getId_Alumno());
-            ps.setInt(2, inscripcion.getId_Curso());
-            ps.setDate(3, Date.valueOf((LocalDate) inscripcion.getFechaInscripcion()));
+             PreparedStatement ps = conexion.prepareStatement(Sql)){
+            ps.setInt(1, Integer.parseInt(inscripcion.getId_Alumno()));
+            ps.setInt(2, Integer.parseInt(inscripcion.getId_Curso()));
+            ps.setDate(3, Date.valueOf(inscripcion.getFechaInscripcion()));
             ps.setString(4, inscripcion.getEstado());
-            int n=ps.executeUpdate();
-            System.out.println("Número de filas afectadas: " + n); // Depuración
-
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "error al insertar la inscripcion");
+            int filasAfectadas = ps.executeUpdate();
+            if (filasAfectadas != 1) {
+                throw new SQLException("No se insertó la inscripción en la base de datos.");
+            }
         }
     }
     public List<Inscripciones> ListarInscripciones() throws SQLException {
@@ -49,55 +47,52 @@ public class InscripcionDAO {
         }
         return ListaInscripciones;
     }
-public int ContarAlumnosInscriptos(int idCurso){
-    List<Inscripciones>ListaInscripciones=new ArrayList<>();
+public int ContarAlumnosInscriptos(String idCurso){
     String Sql="SELECT COUNT(*)\n" +
             "FROM inscripciones\n" +
             "WHERE curso_id = ?;";
         try (Connection conexion= cn.Connect();
-    PreparedStatement ps = ( conexion.prepareStatement(Sql));
-    ResultSet rs=ps.executeQuery()){
-        if (rs.next()){
-           return rs.getInt(1);
-
+             PreparedStatement ps = conexion.prepareStatement(Sql)) {
+            ps.setInt(1, Integer.parseInt(idCurso));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException exc){
+            JOptionPane.showMessageDialog(null, "Error al listar alumnos del curso");
         }
-    } catch (SQLException exc){
-        JOptionPane.showMessageDialog(null, "Error al listar alumnos del curso");
-    }
         return 0;
 }
     public void ObtenerInscripcionesPorId(int id) throws SQLException {
         Inscripciones inscripcionPorId=new Inscripciones();
         String Sql="Select * from inscripciones WHERE Id= ? ";
         try (Connection conexion= cn.Connect();
-             PreparedStatement ps = ( conexion.prepareStatement(Sql));
-             ResultSet rs=ps.executeQuery()){
-            while (rs.next()){
-                inscripcionPorId.setId(rs.getInt(1));
-                inscripcionPorId.setId_Alumno(rs.getString(2));
-                inscripcionPorId.setId_Curso(rs.getString(3));
-                inscripcionPorId.setFechaInscripcion(rs.getDate(4).toLocalDate());
-              inscripcionPorId.setEstado(rs.getString(5));
+             PreparedStatement ps = conexion.prepareStatement(Sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    inscripcionPorId.setId(rs.getInt(1));
+                    inscripcionPorId.setId_Alumno(rs.getString(2));
+                    inscripcionPorId.setId_Curso(rs.getString(3));
+                    inscripcionPorId.setFechaInscripcion(rs.getDate(4).toLocalDate());
+                    inscripcionPorId.setEstado(rs.getString(5));
+                }
             }
         } catch (SQLException exc){
             JOptionPane.showMessageDialog(null, "Error al listar inscripciones");
         }
     }
-    public boolean estaInscripto(int idAlumno, int idCurso){
+    public boolean estaInscripto(String idAlumno, String idCurso){
         String Sql="Select * from inscripciones WHERE estudiante_id= ? AND curso_id = ? LIMIT 1 ";
         try (Connection conexion = cn.Connect();
              PreparedStatement ps = conexion.prepareStatement(Sql)) {
 
-            ps.setInt(1, idAlumno);
-            ps.setInt(2, idCurso);
-
-            ResultSet rs = ps.executeQuery();
-
-            boolean existe = rs.next();
-
-            rs.close();
-
-            return existe;
+            ps.setInt(1, Integer.parseInt(idAlumno));
+            ps.setInt(2, Integer.parseInt(idCurso));
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error al verificar la inscripción.", e);
@@ -138,7 +133,7 @@ public int ContarAlumnosInscriptos(int idCurso){
              ResultSet rs=ps.executeQuery();
             while (rs.next()){
                 Alumnos alumno=new Alumnos();
-                alumno.setId(rs.getInt(rs.getInt("id")));
+                alumno.setId(rs.getString("id"));
                 alumno.setNombre(rs.getString("nombre"));
                 alumno.setApellido(rs.getString("apellido"));
                 alumno.setFecha_Nacimiento(rs.getDate("fecha_nacimento"));
@@ -151,7 +146,7 @@ public int ContarAlumnosInscriptos(int idCurso){
         }
         return alumnosPorCurso ;
     }
-    public List<Inscripciones>BuscarInscripcionesPorAlumno(int idAlumno){
+    public List<Inscripciones>BuscarInscripcionesPorAlumno(String idAlumno){
         List<Inscripciones>inscripcionesPorAlumno=new ArrayList<>();
         String Sql=" SELECT i.*\n" +
                 "        FROM inscripciones i\n" +
@@ -160,11 +155,11 @@ public int ContarAlumnosInscriptos(int idCurso){
                 "        WHERE i.estudiante_id = ? ";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ( conexion.prepareStatement(Sql))){
-            ps.setInt(1, idAlumno);
+            ps.setInt(1, Integer.parseInt(idAlumno));
             ResultSet rs=ps.executeQuery();
             while (rs.next()){
                 Inscripciones inscripcion =new Inscripciones();
-                inscripcion.setId(rs.getInt(rs.getInt("id")));
+                inscripcion.setId(rs.getInt("id"));
                 inscripcion.setId_Alumno(rs.getString("estudiante_id"));
                 inscripcion.setId_Curso(rs.getString("curso_id"));
                 inscripcion.setFechaInscripcion(rs.getDate("fecha_inscripcion").toLocalDate());
@@ -177,7 +172,7 @@ public int ContarAlumnosInscriptos(int idCurso){
         }
         return inscripcionesPorAlumno ;
     }
-    public List<Inscripciones>BuscarInscripcionesPorCurso(int idCurso){
+    public List<Inscripciones>BuscarInscripcionesPorCurso(String idCurso){
         List<Inscripciones>inscripcionesPorAlumno=new ArrayList<>();
         String Sql=" SELECT i.*\n" +
                 "        FROM inscripciones i\n" +
@@ -186,11 +181,11 @@ public int ContarAlumnosInscriptos(int idCurso){
                 "        WHERE i.curso_id = ? ";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ( conexion.prepareStatement(Sql))){
-            ps.setInt(1, idCurso);
+            ps.setInt(1, Integer.parseInt(idCurso));
             ResultSet rs=ps.executeQuery();
             while (rs.next()){
                 Inscripciones inscripcion =new Inscripciones();
-                inscripcion.setId(rs.getInt(rs.getInt("id")));
+                inscripcion.setId(rs.getInt("id"));
                 inscripcion.setId_Alumno(rs.getString("estudiante_id"));
                 inscripcion.setId_Curso(rs.getString("curso_id"));
                 inscripcion.setFechaInscripcion(rs.getDate("fecha_inscripcion").toLocalDate());
@@ -203,20 +198,20 @@ public int ContarAlumnosInscriptos(int idCurso){
         }
         return inscripcionesPorAlumno ;
     }
-    public List<Cursos> buscarCursosPorAlumno(int idAlumno) throws SQLException {
+    public List<Cursos> buscarCursosPorAlumno(String idAlumno) throws SQLException {
         List<Cursos>cursosPorAlumno=new ArrayList<>();
         String Sql=" SELECT c.*\n" +
-                "        FROM cursos a\n" +
+                "        FROM cursos c\n" +
                 "        INNER JOIN inscripciones i\n" +
                 "            ON c.id = i.curso_id\n" +
                 "        WHERE i.estudiante_id = ? ";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = ( conexion.prepareStatement(Sql))){
-            ps.setInt(1, idAlumno);
+            ps.setInt(1, Integer.parseInt(idAlumno));
             ResultSet rs=ps.executeQuery();
             while (rs.next()){
                 Cursos curso=new Cursos();
-                curso.setId(rs.getInt(rs.getInt("id")));
+                curso.setId(rs.getString("id"));
                 curso.setNombre_curso(rs.getString("nombre_curso"));
                curso.setNivel(rs.getString("nivel"));
                 curso.setCupo_Maximo(rs.getInt("cupo_maximo"));
@@ -228,16 +223,17 @@ public int ContarAlumnosInscriptos(int idCurso){
         }
         return cursosPorAlumno ;
     }
-    public boolean existeInscripcion(int idInscripcion){
-        String Sql2="Select * from inscripciones WHERE inscripcion_id= ? LIMIT 1 ";
+    public boolean existeInscripcion(String idInscripcion){
+        String Sql2="Select 1 from inscripciones WHERE id= ? LIMIT 1 ";
         try (Connection conexion= cn.Connect();
-             PreparedStatement ps = ( conexion.prepareStatement(Sql2))){
-             ps.setInt(1,idInscripcion);
-             ResultSet rs=ps.executeQuery();
+             PreparedStatement ps = conexion.prepareStatement(Sql2)) {
+             ps.setInt(1, Integer.parseInt(idInscripcion));
+             try (ResultSet rs = ps.executeQuery()) {
+                 return rs.next();
+             }
         } catch (SQLException exc){
-            JOptionPane.showMessageDialog(null, "Error al verificar inscripción");
+            throw new RuntimeException("Error al verificar inscripción", exc);
         }
-        return true;
     }
     public boolean aproboNivel(int idAlumno, String nivel){
         String Sql3="SELECT 1\n" +
@@ -260,10 +256,11 @@ public int ContarAlumnosInscriptos(int idCurso){
 
 
     public boolean editarEstado(Inscripciones inscripcion){
-        String sql ="update inscripciones set estado = INACTIVO where Id= ?";
+        String sql ="update inscripciones set estado = ? where Id= ?";
         try (Connection conexion= cn.Connect();
              PreparedStatement ps = (conexion.prepareStatement(sql))){
-            ps.setString(4, String.valueOf(inscripcion));
+            ps.setString(1, inscripcion.getEstado());
+            ps.setInt(2, Integer.parseInt(inscripcion.getId()));
             int filasAfectadas=ps.executeUpdate();
             if (filasAfectadas > 0){
                 JOptionPane.showMessageDialog(null, "modificación realizada con exito");
@@ -298,4 +295,3 @@ public int ContarAlumnosInscriptos(int idCurso){
         }
     }
 }
-
